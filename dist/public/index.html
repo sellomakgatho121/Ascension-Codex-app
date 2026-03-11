@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    
+    <!-- Enhanced Mobile Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no, email=no, address=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Ascension Codex" />
+    <meta name="theme-color" content="#0F0A19" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#1A1625" media="(prefers-color-scheme: light)" />
+    
+    <!-- SEO and Social Meta Tags -->
+    <title>Ascension Codex - Divine Blueprint Activation & Spiritual Development</title>
+    <meta name="description" content="Comprehensive spiritual development platform featuring 15-chakra systems, lightbody activation, 12D Shield protection, and AI-guided consciousness evolution. Real-time planetary data and enhanced meditation tools." />
+    <meta name="keywords" content="spiritual development, chakras, lightbody, ascension, consciousness, meditation, energetic synthesis, 12D shield, vibrational healing" />
+    <meta name="author" content="Ascension Codex" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Ascension Codex - Divine Blueprint Activation" />
+    <meta property="og:description" content="Advanced spiritual development platform with 15-chakra systems, AI guidance, and real-time planetary data for consciousness evolution." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ascension-codex.replit.app" />
+    <meta property="og:image" content="/generated-icon.png" />
+    <meta property="og:site_name" content="Ascension Codex" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Ascension Codex - Divine Blueprint Activation" />
+    <meta name="twitter:description" content="Advanced spiritual development platform with AI guidance and comprehensive spiritual tools." />
+    <meta name="twitter:image" content="/generated-icon.png" />
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/png" href="/generated-icon.png" />
+    <link rel="apple-touch-icon" href="/generated-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Performance and Caching -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Critical CSS Inline Styles for Mobile Performance -->
+    <style>
+      /* Critical mobile viewport fixes */
+      html { 
+        -webkit-text-size-adjust: 100%; 
+        -ms-text-size-adjust: 100%;
+        touch-action: manipulation;
+        scroll-behavior: smooth;
+      }
+      
+      body { 
+        margin: 0; 
+        padding: 0; 
+        font-family: system-ui, -apple-system, sans-serif;
+        background-color: #0F0A19;
+        color: #F5F3FF;
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Fix for 100vh issue on mobile */
+      .min-h-screen {
+        min-height: 100vh;
+        min-height: 100dvh; /* Dynamic viewport height for better mobile support */
+      }
+      
+      #root { 
+        min-height: 100vh; 
+        min-height: 100dvh;
+      }
+      
+      /* Prevent 300ms tap delay */
+      * {
+        touch-action: manipulation;
+      }
+      
+      /* Loading spinner for performance */
+      .app-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0F0A19;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #1A1625;
+        border-top: 3px solid #D4AF37;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BDE5WS04.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B49L1brA.css">
+  </head>
+  <body>
+    <!-- App Loading Screen -->
+    <div id="app-loading" class="app-loading">
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <div id="root"></div>
+    
+    <!-- Mobile-optimized script loading -->
+    
+    <!-- Remove loading screen when app loads -->
+    <script>
+      window.addEventListener('load', function() {
+        const loading = document.getElementById('app-loading');
+        if (loading) {
+          setTimeout(() => {
+            loading.style.opacity = '0';
+            loading.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => loading.remove(), 300);
+          }, 500);
+        }
+      });
+      
+      // Enhanced error handling for mobile
+      window.addEventListener('error', function(e) {
+        console.error('App Error:', e.error);
+      });
+      
+      // Service Worker Registration for PWA capabilities
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+              console.log('SW registered: ', registration);
+            })
+            .catch(function(registrationError) {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>
