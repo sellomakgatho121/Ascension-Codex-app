@@ -1,0 +1,517 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Apply Tailwind's base, components, and utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Golden Ratio Typography System */
+:root {
+  /* Golden ratio constants */
+  --golden-ratio: 1.618;
+  --golden-ratio-inverse: 0.618;
+  
+  /* Golden ratio animation durations (in seconds) */
+  --anim-fastest: 0.618s;  /* φ⁻¹ */
+  --anim-fast: 1s;         /* base */
+  --anim-medium: 1.618s;   /* φ */
+  --anim-slow: 2.618s;     /* φ² */
+  --anim-slowest: 4.236s;  /* φ³ */
+  --anim-epic: 6.854s;     /* φ⁴ */
+  
+  /* Golden ratio timing functions */
+  --ease-golden: cubic-bezier(0.618, 0, 0.382, 1);
+  --ease-golden-in: cubic-bezier(0.618, 0, 1, 1);
+  --ease-golden-out: cubic-bezier(0, 0, 0.382, 1);
+  --ease-golden-bounce: cubic-bezier(0.618, 1.618, 0.382, 0.618);
+  
+  /* Base measurements */
+  --base-font-size: 16px;
+  --base-line-height: 1.618;
+  
+  /* Golden ratio font scale */
+  --font-xs: 10px;   /* base / φ */
+  --font-sm: 13px;   /* base * 0.8 */
+  --font-base: 16px; /* base */
+  --font-md: 20px;   /* base * 1.25 */
+  --font-lg: 26px;   /* base * φ */
+  --font-xl: 33px;   /* base * φ * √φ */
+  --font-2xl: 42px;  /* base * φ² */
+  --font-3xl: 54px;  /* base * φ² * √φ */
+  --font-4xl: 69px;  /* base * φ³ */
+  --font-5xl: 89px;  /* base * φ³ * √φ */
+  --font-6xl: 111px; /* base * φ⁴ */
+  
+  /* Golden ratio spacing scale */
+  --spacing-xs: 8px;    /* base / 2 */
+  --spacing-sm: 10px;   /* base / φ */
+  --spacing-base: 16px; /* base */
+  --spacing-md: 20px;   /* base * 1.25 */
+  --spacing-lg: 26px;   /* base * φ */
+  --spacing-xl: 33px;   /* base * φ * √φ */
+  --spacing-2xl: 42px;  /* base * φ² */
+  --spacing-3xl: 54px;  /* base * φ² * √φ */
+  --spacing-4xl: 69px;  /* base * φ³ */
+  --spacing-5xl: 89px;  /* base * φ³ * √φ */
+  
+  /* Golden ratio line heights */
+  --line-height-tight: 1;
+  --line-height-base: 1.618;
+  --line-height-relaxed: 2.058; /* φ * √φ */
+  --line-height-loose: 2.618;   /* φ² */
+  
+  /* Golden ratio breakpoints */
+  --breakpoint-sm: 777px;  /* 480 * φ */
+  --breakpoint-md: 1243px; /* 768 * φ */
+  --breakpoint-lg: 1657px; /* 1024 * φ */
+  --breakpoint-xl: 2071px; /* 1280 * φ */
+  --breakpoint-2xl: 2486px; /* 1536 * φ */
+}
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(275, 100%, 25%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* Refined Ascension Codex theme colors - Based on design plan */
+  /* Deep Indigo - Primary */
+  --deep-indigo: hsl(275, 100%, 25%);
+  --deep-indigo-light: hsl(275, 100%, 35%);
+  --deep-indigo-dark: hsl(275, 100%, 20%);
+  
+  /* Dark Violet - Accent */
+  --dark-violet: hsl(282, 100%, 41%);
+  --dark-violet-light: hsl(282, 100%, 51%);
+  --dark-violet-dark: hsl(282, 100%, 31%);
+  
+  /* Royal Purple - Secondary */
+  --royal-purple: hsl(300, 100%, 25%);
+  --royal-purple-light: hsl(300, 100%, 35%);
+  --royal-purple-dark: hsl(300, 100%, 20%);
+  
+  /* Medium Slate Blue - Tertiary */
+  --slate-blue: hsl(249, 80%, 67%);
+  --slate-blue-light: hsl(249, 80%, 77%);
+  --slate-blue-dark: hsl(249, 80%, 57%);
+  
+  /* Luminous Violet - Soft Accent */
+  --luminous-violet: hsl(300, 76%, 72%);
+  --luminous-violet-light: hsl(300, 76%, 82%);
+  --luminous-violet-dark: hsl(300, 76%, 62%);
+
+  /* Cosmic scale - Refined for glassmorphic design */
+  --cosmic-50: hsl(275, 80%, 98%);
+  --cosmic-100: hsl(275, 40%, 92%);
+  --cosmic-200: hsl(275, 35%, 85%);
+  --cosmic-300: hsl(275, 30%, 75%);
+  --cosmic-400: hsl(275, 25%, 65%);
+  --cosmic-500: hsl(275, 45%, 45%);
+  --cosmic-600: hsl(275, 50%, 35%);
+  --cosmic-700: hsl(275, 55%, 25%);
+  --cosmic-800: hsl(275, 60%, 15%);
+  --cosmic-900: hsl(275, 70%, 8%);
+
+  /* Sacred mystical colors - Enhanced */
+  --sacred-gold: hsl(45, 95%, 65%);
+  --sacred-silver: hsl(220, 15%, 85%);
+  --sacred-violet: hsl(280, 70%, 65%);
+  --sacred-crystal: hsl(200, 80%, 75%);
+  --sacred-emerald: hsl(160, 70%, 55%);
+
+  /* Three-Fold Flame colors */
+  --flame-blue: hsl(217, 91%, 60%);      /* Power/Will */
+  --flame-gold: hsl(45, 95%, 60%);       /* Wisdom/Illumination */
+  --flame-rose: hsl(330, 81%, 60%);      /* Love/Adoration */
+
+  /* Brand accent colors - Updated */
+  --cosmic-blue: hsl(217, 91%, 65%);
+  --ascension-purple: hsl(282, 100%, 41%);
+  --divine-white: hsl(0, 0%, 98%);
+
+  /* Glassmorphic design tokens */
+  --glass-white: hsla(0, 0%, 100%, 0.05);
+  --glass-white-hover: hsla(0, 0%, 100%, 0.1);
+  --glass-border: hsla(255, 255%, 255%, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-blur: blur(16px);
+
+  /* Chakra colors - Enhanced visibility */
+  --chakra-root: hsl(0, 84%, 60%);
+  --chakra-sacral: hsl(22, 89%, 58%);
+  --chakra-solar: hsl(51, 100%, 50%);
+  --chakra-solar-plexus: hsl(51, 100%, 50%);
+  --chakra-heart: hsl(120, 60%, 50%);
+  --chakra-throat: hsl(217, 91%, 65%);
+  --chakra-third: hsl(271, 81%, 56%);
+  --chakra-third-eye: hsl(271, 81%, 56%);
+  --chakra-crown: hsl(258, 90%, 72%);
+  --chakra-higher: hsl(186, 94%, 55%);
+  --chakra-atomic: hsl(295, 76%, 65%);
+  --chakra-solar-star: hsl(217, 72%, 50%);
+  --chakra-galactic: hsl(280, 65%, 55%);
+  --chakra-earth-star: hsl(45, 100%, 75%);
+  --chakra-earth-core: hsl(186, 94%, 45%);
+  --chakra-universal-sun: hsl(48, 96%, 63%);
+  --chakra-universal-father: hsl(322, 82%, 52%);
+}
+
+.dark {
+  --background: hsl(275, 70%, 8%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(275, 15%, 15%);
+  --muted-foreground: hsl(275, 10%, 65%);
+  --popover: hsl(275, 60%, 10%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(275, 60%, 12%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsla(275, 50%, 50%, 0.15);
+  --input: hsla(275, 50%, 50%, 0.15);
+  --primary: hsl(282, 100%, 41%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(275, 30%, 18%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(282, 100%, 51%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 50%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(282, 100%, 51%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-body antialiased bg-cosmic-900 text-white;
+    font-family: 'Open Sans', 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: var(--line-height-base);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+    font-weight: 700;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+    font-weight: 700;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+    font-weight: 600;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl;
+    font-weight: 600;
+  }
+
+  h5 {
+    @apply text-lg md:text-xl;
+    font-weight: 500;
+  }
+
+  h6 {
+    @apply text-base md:text-lg;
+    font-weight: 500;
+  }
+
+  code, pre {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  .font-header {
+    font-family: 'Cinzel', serif;
+  }
+
+  .font-body {
+    font-family: 'Open Sans', 'Inter', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  /* Fix text contrast issues */
+  .text-muted-foreground {
+    color: hsl(275, 20%, 70%);
+  }
+
+  /* Typography utilities */
+  .text-metadata {
+    @apply text-xs uppercase tracking-wider font-medium;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+@layer components {
+  /* Glassmorphic utilities */
+  .glass {
+    background: var(--glass-white);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-hover {
+    @apply glass transition-all duration-300;
+  }
+
+  .glass-hover:hover {
+    background: var(--glass-white-hover);
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Bento grid utilities */
+  .bento-grid {
+    @apply grid gap-4 md:gap-6;
+    grid-auto-rows: minmax(200px, auto);
+  }
+
+  .bento-item-hero {
+    @apply col-span-full md:col-span-2 md:row-span-2;
+  }
+
+  .bento-item-large {
+    @apply col-span-full md:col-span-2 md:row-span-1;
+  }
+
+  .bento-item-standard {
+    @apply col-span-full md:col-span-1 md:row-span-1;
+  }
+
+  .bento-item-compact {
+    @apply col-span-full md:col-span-1;
+  }
+
+  /* Subtle border style */
+  .border-subtle {
+    border: 1px solid hsla(255, 255%, 255%, 0.1);
+  }
+
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsla(282, 100%, 41%, 0.3);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 20px hsla(45, 95%, 65%, 0.3);
+  }
+
+  .glow-hover {
+    @apply transition-all duration-300;
+  }
+
+  .glow-hover:hover {
+    box-shadow: 0 0 30px hsla(282, 100%, 41%, 0.5);
+  }
+
+  /* Island architecture - floating containers */
+  .island {
+    @apply glass rounded-2xl p-4 shadow-2xl;
+  }
+
+  .island-floating {
+    @apply island fixed z-50 animate-in slide-in-from-bottom-5;
+  }
+
+  /* Focus mode utilities */
+  .focus-mode {
+    @apply transition-all duration-500;
+  }
+
+  .focus-mode:not(.active) {
+    @apply opacity-30 blur-sm;
+  }
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-shimmer {
+    animation: shimmer 8s ease-in-out infinite;
+    background-size: 200% 100%;
+  }
+
+  @keyframes shimmer {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 0 5px currentColor);
+    }
+    to {
+      filter: drop-shadow(0 0 20px currentColor);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* Hover scale with smooth transition */
+  .hover-scale {
+    @apply transition-transform duration-300 ease-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  /* Backdrop blur utilities */
+  .backdrop-blur-glass {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Text gradients */
+  .text-gradient-cosmic {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-deep-indigo via-dark-violet to-luminous-violet;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300;
+  }
+
+  /* Sacred geometry patterns */
+  .pattern-dots {
+    background-image: radial-gradient(circle, hsla(255, 255%, 255%, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .pattern-grid {
+    background-image: linear-gradient(hsla(255, 255%, 255%, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, hsla(255, 255%, 255%, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cosmic-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cosmic-700);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cosmic-600);
+}
+
+/* Selection color */
+::selection {
+  background: var(--dark-violet);
+  color: white;
+}
+
+/* Focus visible styles */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Existing patterns and custom styles */
+.ascension-codex-pattern {
+  position: relative;
+}
+
+.ascension-codex-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle, hsla(280, 70%, 65%, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.font-sacred {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+}
+
+/* Preserve existing utility classes */
+.hover\:drop-shadow-glow:hover {
+  filter: drop-shadow(0 0 15px rgba(138, 43, 226, 0.5));
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .mobile-nav-active {
+    overflow: hidden;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
