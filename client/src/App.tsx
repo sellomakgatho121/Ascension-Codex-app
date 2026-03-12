@@ -58,6 +58,7 @@ import DnaActivationPage from './pages/dna-activation';
 import DnaVisualizationPage from './pages/dna-visualization';
 import DimensionalAccessPage from './pages/dimensional-access';
 import AscensionMechanicsPage from './pages/ascension-mechanics';
+import EnhancedToolsPage from './pages/enhanced-tools';
 
 function Router() {
   return (
@@ -134,6 +135,11 @@ function Router() {
           <Route path="/tools">
             <PageTransitionWrapper variant="portal">
               <ToolsPage />
+            </PageTransitionWrapper>
+          </Route>
+          <Route path="/enhanced-tools">
+            <PageTransitionWrapper variant="portal">
+              <EnhancedToolsPage />
             </PageTransitionWrapper>
           </Route>
           <Route path="/knowledge-base">
