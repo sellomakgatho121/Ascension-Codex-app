@@ -38,7 +38,7 @@ export function Navigation() {
       icon: <Sparkles className="w-4 h-4" />,
       items: [
         { href: "/meditation", title: "Meditation Library", description: "Guided techniques for clearing" },
-        { href: "/tools", title: "Spiritual Tools", description: "Shielding, clearing, and activation" },
+        { href: "/enhanced-tools", title: "Spiritual Tools", description: "Shielding, clearing, and activation" },
         { href: "/psychic-self-defense", title: "Psychic Defense", description: "Protective protocols and clearing" },
         { href: "/visual-diagrams", title: "Visual Diagrams", description: "Interactive schema exploration" },
         { href: "/3d-visualizations", title: "3D Visualizations", description: "Immersive energy field systems" },
