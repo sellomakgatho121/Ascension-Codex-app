@@ -1,8 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Activity, BookOpen, Brain, Sparkles, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { GlobalSearch } from "@/components/global-search";
-import { ThreeFoldFlameLogo } from "./three-fold-flame-logo";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,18 +11,38 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MobileNavigation } from "./mobile-navigation";
-import { springs, staggerContainer } from "@/lib/animation-system";
+import { antiSprings, antiGlitchFlash } from "@/lib/anti-animation-system";
 
 export function Navigation() {
   const [location] = useLocation();
+  const [glitchActive, setGlitchActive] = useState(false);
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      setTime(now.toISOString().slice(11, 19));
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGlitchActive(true);
+      setTimeout(() => setGlitchActive(false), 300);
+    }, 5000 + Math.random() * 8000);
+    return () => clearInterval(interval);
+  }, []);
 
   const menuGroups = [
     {
-      title: "Core Systems",
-      icon: <Activity className="w-4 h-4" />,
+      title: "SYS//CORE",
+      coord: "[0x01]",
       items: [
         { href: "/chakras", title: "15-Chakra System", description: "Anatomy of the multidimensional soul" },
         { href: "/lightbody", title: "Lightbody Layers", description: "7 layers of the auric field" },
@@ -34,8 +53,8 @@ export function Navigation() {
       ]
     },
     {
-      title: "Practice",
-      icon: <Sparkles className="w-4 h-4" />,
+      title: "PRAXIS",
+      coord: "[0x02]",
       items: [
         { href: "/meditation", title: "Meditation Library", description: "Guided techniques for clearing" },
         { href: "/enhanced-tools", title: "Spiritual Tools", description: "Shielding, clearing, and activation" },
@@ -47,8 +66,8 @@ export function Navigation() {
       ]
     },
     {
-      title: "Knowledge",
-      icon: <BookOpen className="w-4 h-4" />,
+      title: "ARCHIVE",
+      coord: "[0x03]",
       items: [
         { href: "/knowledge-base", title: "Knowledge Base", description: "Comprehensive spiritual library" },
         { href: "/glossary", title: "Glossary", description: "Ascension terminology defined" },
@@ -59,12 +78,12 @@ export function Navigation() {
       ]
     },
     {
-      title: "Community & AI",
-      icon: <Brain className="w-4 h-4" />,
+      title: "NET//AI",
+      coord: "[0x04]",
       items: [
         { href: "/community", title: "Community", description: "Connect with dedicated practitioners" },
         { href: "/vers", title: "VERS AI", description: "Virtual Entity Recognition System" },
-        { href: "/vers-whisper-live", title: "WhisperLive service", description: "Real-time voice transcription" },
+        { href: "/vers-whisper-live", title: "WhisperLive", description: "Real-time voice transcription" },
         { href: "/soul-codex", title: "Soul Codex", description: "Personal spiritual registry" },
         { href: "/gsf", title: "GSF Foundation", description: "God-Sovereign-Free details" },
       ]
@@ -72,39 +91,34 @@ export function Navigation() {
   ];
 
   return (
-    <header className="bg-cosmic-900/80 backdrop-blur-lg border-b border-sacred-gold/10 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
+    <header className="bg-anti-void/90 backdrop-blur-sm border-b border-anti-acid/20 sticky top-0 z-50 font-anti-mono">
+      <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={springs.elegant}
+            transition={antiSprings.snap}
           >
             <Link href="/">
               <motion.a
-                className="flex items-center space-x-3 group cursor-pointer min-w-0"
+                className="flex items-center space-x-3 group cursor-pointer min-w-0 magnetic-hover"
                 whileHover="hover"
+                variants={antiGlitchFlash}
+                animate={glitchActive ? "glitch" : "idle"}
               >
                 <div className="relative">
-                  <ThreeFoldFlameLogo
-                    size={40}
-                    animated={true}
-                    className="group-hover:scale-110 transition-transform duration-500 flex-shrink-0"
-                  />
-                  <motion.div
-                    variants={{
-                      hover: { scale: 1.2, opacity: 0.6, rotate: 180 }
-                    }}
-                    className="absolute inset-0 bg-sacred-gold/20 blur-xl rounded-full opacity-0"
-                  />
+                  <div className="w-10 h-10 border border-anti-acid bg-anti-void flex items-center justify-center relative overflow-hidden">
+                    <span className="text-anti-acid font-anti-display text-2xl leading-none tracking-tighter">AC</span>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-anti-acid animate-anti-marquee" />
+                  </div>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-2xl font-sacred font-bold text-transparent bg-clip-text bg-gradient-to-r from-sacred-gold via-white to-sacred-gold animate-shimmer truncate tracking-tight">
-                    <span className="hidden sm:inline">Ascension Codex</span>
-                    <span className="sm:hidden">AC</span>
+                  <h1 className="text-lg font-anti-display tracking-[0.2em] text-anti-static uppercase leading-none">
+                    <span className="hidden sm:inline">ASCENSION_CODEX</span>
+                    <span className="sm:hidden">A_C</span>
                   </h1>
-                  <span className="text-[10px] tracking-[0.3em] text-sacred-gold/60 font-bold hidden md:block uppercase truncate">
-                    Divine Blueprint Activation
+                  <span className="text-[9px] tracking-[0.4em] text-anti-acid/60 font-anti-mono hidden md:block uppercase">
+                    {time} // ACTIVE
                   </span>
                 </div>
               </motion.a>
@@ -113,77 +127,62 @@ export function Navigation() {
 
           <div className="hidden lg:flex items-center justify-center flex-1 px-4">
             <NavigationMenu>
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={staggerContainer(0.1)}
-              >
-                <NavigationMenuList className="space-x-1">
-                  {menuGroups.map((group) => (
-                    <NavigationMenuItem key={group.title}>
-                      <motion.div
-                        variants={{
-                          hidden: { y: -10, opacity: 0 },
-                          visible: { y: 0, opacity: 1 }
-                        }}
-                      >
-                        <NavigationMenuTrigger className="bg-transparent hover:bg-white/5 text-cosmic-100 hover:text-sacred-gold focus:bg-white/5 focus:text-sacred-gold data-[state=open]:bg-white/10 data-[state=open]:text-sacred-gold transition-all duration-300">
-                          <span className="flex items-center gap-2 relative">
-                            {group.title}
-                            {/* Animated Underline for Active State could go here if grouped */}
-                          </span>
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent>
-                          <ul className="grid w-[400px] gap-3 p-6 md:w-[500px] md:grid-cols-2 lg:w-[700px] bg-cosmic-900/95 backdrop-blur-2xl border border-sacred-gold/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden overscroll-contain">
-                            <AnimatePresence>
-                              {group.items.map((item, idx) => (
-                                <motion.div
-                                  key={item.title}
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: idx * 0.05 }}
-                                >
-                                  <ListItem title={item.title} href={item.href}>
-                                    {item.description}
-                                  </ListItem>
-                                </motion.div>
-                              ))}
-                            </AnimatePresence>
-                          </ul>
-                        </NavigationMenuContent>
-                      </motion.div>
-                    </NavigationMenuItem>
-                  ))}
-                </NavigationMenuList>
-              </motion.div>
+              <NavigationMenuList className="space-x-0">
+                {menuGroups.map((group) => (
+                  <NavigationMenuItem key={group.title}>
+                    <NavigationMenuTrigger className="bg-transparent hover:bg-anti-acid/5 text-anti-static/70 hover:text-anti-acid focus:bg-anti-acid/5 focus:text-anti-acid data-[state=open]:bg-anti-acid/10 data-[state=open]:text-anti-acid transition-all duration-150 font-anti-mono text-xs tracking-widest uppercase rounded-none border-b border-transparent hover:border-anti-acid/30 data-[state=open]:border-anti-acid/50 px-3 py-2 h-auto">
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-anti-acid/40 text-[10px]">{group.coord}</span>
+                        {group.title}
+                      </span>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-0 p-0 md:w-[500px] md:grid-cols-2 lg:w-[650px] bg-anti-void/98 backdrop-blur-sm border border-anti-acid/20 shadow-[0_0_30px_rgba(57,255,20,0.05)] rounded-none overflow-hidden">
+                        <div className="col-span-full px-4 py-2 border-b border-anti-acid/10 flex justify-between items-center">
+                          <span className="text-[10px] text-anti-acid/50 font-anti-mono tracking-widest">{group.coord} {group.title}</span>
+                          <span className="text-[10px] text-anti-acid/30 font-anti-mono">{group.items.length} ENTRIES</span>
+                        </div>
+                        <AnimatePresence>
+                          {group.items.map((item, idx) => (
+                            <motion.div
+                              key={item.title}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.03 }}
+                            >
+                              <ListItem title={item.title} href={item.href} index={idx}>
+                                {item.description}
+                              </ListItem>
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
             </NavigationMenu>
           </div>
 
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={springs.snappy}
-              className="hidden xl:block w-64"
+              transition={antiSprings.snap}
+              className="hidden xl:block w-56"
             >
               <GlobalSearch />
             </motion.div>
 
             <div className="hidden md:block xl:hidden">
-              <Button variant="ghost" size="icon" className="text-sacred-gold hover:scale-110 transition-transform">
-                <Search className="w-5 h-5" />
+              <Button variant="ghost" size="icon" className="text-anti-acid hover:text-anti-neon hover:bg-anti-acid/5 rounded-none border border-transparent hover:border-anti-acid/30 transition-all">
+                <Search className="w-4 h-4" />
               </Button>
             </div>
 
-            {/* Mobile Navigation */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={springs.bouncy}
-              className="lg:hidden"
-            >
+            <div className="lg:hidden">
               <MobileNavigation />
-            </motion.div>
+            </div>
           </div>
         </div>
       </div>
@@ -191,36 +190,44 @@ export function Navigation() {
   );
 }
 
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, href, ...props }, ref) => {
-  const [location] = useLocation();
-  const isActive = location === href;
+interface ListItemProps extends React.ComponentPropsWithoutRef<"a"> {
+  title: string;
+  href?: string;
+  index?: number;
+}
 
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link href={href!}>
-          <a
-            ref={ref}
-            className={cn(
-              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-cosmic-800 hover:text-sacred-gold focus:bg-cosmic-800 focus:text-accent-foreground group",
-              isActive ? "bg-cosmic-800/80 border-l-2 border-sacred-gold" : "",
-              className
-            )}
-            {...props}
-          >
-            <div className="text-sm font-medium leading-none text-cosmic-100 group-hover:text-sacred-gold transition-colors">
-              {title}
-            </div>
-            <p className="line-clamp-2 text-xs leading-snug text-cosmic-400 group-hover:text-cosmic-300">
-              {children}
-            </p>
-          </a>
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-})
+const ListItem = React.forwardRef<React.ElementRef<"a">, ListItemProps>(
+  ({ className, title, children, href, index = 0, ...props }, ref) => {
+    const [location] = useLocation();
+    const isActive = location === href;
+
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <Link href={href!}>
+            <a
+              ref={ref}
+              className={cn(
+                "block select-none space-y-1 p-3 leading-none no-underline outline-none transition-all duration-150 hover:bg-anti-acid/5 border-b border-anti-acid/5 last:border-b-0 group font-anti-mono",
+                isActive ? "bg-anti-acid/10 border-l-2 border-l-anti-acid" : "border-l-2 border-l-transparent",
+                className
+              )}
+              {...props}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-anti-acid/30 tabular-nums">{String(index).padStart(2, '0')}</span>
+                <span className="text-xs font-medium leading-none text-anti-static/80 group-hover:text-anti-acid transition-colors tracking-wide uppercase">
+                  {title}
+                </span>
+              </div>
+              <p className="line-clamp-1 text-[11px] leading-snug text-anti-static/30 group-hover:text-anti-static/50 pl-5">
+                {children}
+              </p>
+            </a>
+          </Link>
+        </NavigationMenuLink>
+      </li>
+    );
+  }
+);
 ListItem.displayName = "ListItem";

@@ -70,42 +70,37 @@ export default function VisualDiagrams() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cosmic-950 via-cosmic-900 to-cosmic-800">
-      {/* Header */}
-      <section className="relative py-24 md:py-32 px-5 text-center overflow-hidden">
-        {/* Animated Background Elements */}
+    <div className="min-h-screen bg-anti-bg font-anti-mono">
+      <section className="relative py-20 md:py-28 px-5 overflow-hidden">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-purple-900/10 rounded-full blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-blue-900/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-anti-acid/[0.02] blur-[120px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-anti-neon/[0.02] blur-[120px]"></div>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="relative z-10 max-w-4xl mx-auto px-4"
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-10 max-w-5xl mx-auto px-4"
         >
-          <div className="mb-8 flex justify-center">
-            <Activity className="w-20 h-20 text-sacred-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.6)]" />
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-1.5 h-1.5 bg-anti-acid rounded-full animate-pulse shadow-[0_0_6px_rgba(57,255,20,0.5)]" />
+            <span className="text-[10px] text-anti-acid/40 tracking-[0.5em] uppercase">MODULE.VISUAL // DIAGRAMS.ACTIVE</span>
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-anti-acid/10 to-transparent" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-sacred font-bold text-transparent bg-clip-text bg-gradient-to-r from-sacred-gold via-white to-sacred-gold mb-8 tracking-tight animate-gradient-x leading-tight">
-            Visual Diagrams
+          <h1 className="text-5xl md:text-7xl font-anti-display tracking-[0.1em] text-anti-static uppercase mb-4 leading-tight">
+            VISUAL<br />
+            <span className="text-anti-acid">DIAGRAMS</span>
           </h1>
-          <p className="text-xl md:text-2xl text-cosmic-100 mb-10 max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-sm md:text-base text-anti-static/40 mb-8 max-w-2xl leading-relaxed tracking-wide border-l-2 border-anti-acid/20 pl-4">
             Interactive visualizations of spiritual systems, consciousness evolution,
             and energetic anatomy based on authentic Energetic Synthesis teachings.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            <Badge variant="outline" className="text-sacred-gold border-sacred-gold/40 bg-sacred-gold/10 px-5 py-2 text-sm font-semibold tracking-wide">
-              Interactive SVG Diagrams
-            </Badge>
-            <Badge variant="outline" className="text-sacred-gold border-sacred-gold/40 bg-sacred-gold/10 px-5 py-2 text-sm font-semibold tracking-wide">
-              Sacred Geometry
-            </Badge>
-            <Badge variant="outline" className="text-sacred-gold border-sacred-gold/40 bg-sacred-gold/10 px-5 py-2 text-sm font-semibold tracking-wide">
-              ES Teachings
-            </Badge>
+          <div className="flex flex-wrap gap-3">
+            <span className="text-[9px] border border-anti-acid/20 text-anti-acid/40 px-3 py-1 tracking-[0.3em] uppercase">INTERACTIVE_SVG</span>
+            <span className="text-[9px] border border-anti-acid/20 text-anti-acid/40 px-3 py-1 tracking-[0.3em] uppercase">SACRED_GEOMETRY</span>
+            <span className="text-[9px] border border-anti-acid/20 text-anti-acid/40 px-3 py-1 tracking-[0.3em] uppercase">ES_TEACHINGS</span>
           </div>
         </motion.div>
       </section>
@@ -114,31 +109,31 @@ export default function VisualDiagrams() {
       <section className="py-16 md:py-24 px-5 relative z-10">
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="consciousness" className="w-full">
-            <div className="flex justify-center mb-16">
-              <TabsList className="bg-white/5 border border-white/10 p-1.5 rounded-full backdrop-blur-xl flex-wrap justify-center h-auto">
+            <div className="flex justify-center mb-12">
+              <TabsList className="bg-anti-void/80 border border-anti-acid/15 p-1 rounded-none backdrop-blur-sm flex-wrap justify-center h-auto">
                 {diagramCategories.map((category) => (
                   <TabsTrigger
                     key={category.id}
                     value={category.id}
-                    className="data-[state=active]:bg-sacred-gold data-[state=active]:text-cosmic-950 px-8 py-3 rounded-full transition-all duration-500 font-bold tracking-wide m-1"
+                    className="data-[state=active]:bg-anti-acid data-[state=active]:text-anti-void px-6 py-2.5 rounded-none transition-all duration-200 font-anti-mono text-xs tracking-widest uppercase m-0.5"
                   >
-                    <category.icon className="w-4 h-4 mr-2.5" />
+                    <category.icon className="w-3.5 h-3.5 mr-2" />
                     {category.name}
                   </TabsTrigger>
                 ))}
               </TabsList>
             </div>
 
-            {/* Consciousness Systems */}
-            <TabsContent value="consciousness" className="space-y-12">
+            <TabsContent value="consciousness" className="space-y-8">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
+                initial={{ opacity: 0, skewY: 1 }}
+                animate={{ opacity: 1, skewY: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="mb-10 border-b border-anti-acid/10 pb-4"
               >
-                <h2 className="text-4xl font-sacred font-bold text-white mb-6">Consciousness Systems</h2>
-                <p className="text-cosmic-100 max-w-2xl mx-auto text-lg leading-relaxed">
+                <span className="text-[10px] text-anti-acid/30 tracking-[0.5em] uppercase block mb-2">[0x01] CONSCIOUSNESS</span>
+                <h2 className="text-3xl font-anti-display tracking-[0.1em] text-anti-static uppercase mb-3">CONSCIOUSNESS SYSTEMS</h2>
+                <p className="text-anti-static/30 max-w-2xl text-xs leading-relaxed tracking-wide">
                   Explore the multidimensional architecture of consciousness through interactive
                   chakra systems, hova bodies, and universal matrices.
                 </p>
@@ -146,8 +141,8 @@ export default function VisualDiagrams() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* 15-Chakra System */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-sacred-gold/20 mr-4 border border-sacred-gold/30">
                         <Activity className="w-7 h-7 text-sacred-gold" />
@@ -169,8 +164,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Hova Bodies & Radial System */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-purple-500/20 mr-4 border border-purple-500/30">
                         <Box className="w-7 h-7 text-purple-400" />
@@ -192,8 +187,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Lightbody Layers */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-sacred-display/20 mr-4 border border-sacred-display/30">
                         <Layers className="w-7 h-7 text-sacred-display" />
@@ -217,8 +212,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* 12-Tree Grid */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-emerald-500/20 mr-4 border border-emerald-500/30">
                         <GitBranch className="w-7 h-7 text-emerald-400" />
@@ -242,8 +237,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Universal Time Matrix */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-indigo-500/20 mr-4 border border-indigo-500/30">
                         <Globe className="w-7 h-7 text-indigo-400" />
@@ -266,8 +261,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* 15D Harmonic Universes Map */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-orange-500/20 mr-4 border border-orange-500/30">
                         <CircleDot className="w-7 h-7 text-orange-400" />
@@ -287,16 +282,16 @@ export default function VisualDiagrams() {
               </div>
             </TabsContent>
 
-            {/* Energy & DNA Systems */}
-            <TabsContent value="energy" className="space-y-12 min-h-[600px]">
+            <TabsContent value="energy" className="space-y-8 min-h-[600px]">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="text-center mb-16"
+                initial={{ opacity: 0, skewY: 1 }}
+                animate={{ opacity: 1, skewY: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                className="mb-10 border-b border-anti-acid/10 pb-4"
               >
-                <h2 className="text-4xl font-sacred font-bold text-white mb-6">Energy & DNA Systems</h2>
-                <p className="text-cosmic-100 max-w-2xl mx-auto text-lg leading-relaxed">
+                <span className="text-[10px] text-anti-acid/30 tracking-[0.5em] uppercase block mb-2">[0x02] ENERGY.DNA</span>
+                <h2 className="text-3xl font-anti-display tracking-[0.1em] text-anti-static uppercase mb-3">ENERGY & DNA SYSTEMS</h2>
+                <p className="text-anti-static/30 max-w-2xl text-xs leading-relaxed tracking-wide">
                   Discover DNA activation patterns, merkaba light vehicles, auric fields,
                   and spiritual energy centers.
                 </p>
@@ -304,8 +299,8 @@ export default function VisualDiagrams() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* 12-Strand DNA Activation */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-red-500/20 mr-4 border border-red-500/30">
                         <Dna className="w-7 h-7 text-red-400" />
@@ -329,8 +324,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Axiatonal Lines */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-cyan-500/20 mr-4 border border-cyan-500/30">
                         <Share2 className="w-7 h-7 text-cyan-400" />
@@ -349,8 +344,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Merkaba Vehicle */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-blue-500/20 mr-4 border border-blue-500/30">
                         <Star className="w-7 h-7 text-blue-400" />
@@ -373,8 +368,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Aura Layers */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-purple-500/20 mr-4 border border-purple-500/30">
                         <Layers className="w-7 h-7 text-purple-400" />
@@ -398,8 +393,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Energy Centers */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-orange-500/20 mr-4 border border-orange-500/30">
                         <Target className="w-7 h-7 text-orange-400" />
@@ -423,8 +418,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* The Hara Line */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-yellow-500/20 mr-4 border border-yellow-500/30">
                         <LineChart className="w-7 h-7 text-yellow-400" />
@@ -461,8 +456,8 @@ export default function VisualDiagrams() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Protection Shields */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-yellow-500/20 mr-4 border border-yellow-500/30">
                         <Shield className="w-7 h-7 text-yellow-500" />
@@ -486,8 +481,8 @@ export default function VisualDiagrams() {
                 </Card>
 
                 {/* Enhanced Human Anatomy */}
-                <Card className="glass-card overflow-hidden group hover:border-sacred-gold/60 transition-all duration-500 mx-auto w-full max-w-2xl">
-                  <CardHeader className="bg-white/5 border-b border-white/10 p-8">
+                <Card className="border border-anti-acid/10 bg-anti-void/60 overflow-hidden group hover:border-anti-acid/30 transition-all duration-300 mx-auto w-full max-w-2xl rounded-none">
+                  <CardHeader className="bg-anti-void/40 border-b border-anti-acid/10 p-6">
                     <CardTitle className="text-white flex items-center text-2xl font-sacred">
                       <div className="p-3 rounded-xl bg-pink-500/20 mr-4 border border-pink-500/30">
                         <User className="w-7 h-7 text-pink-400" />

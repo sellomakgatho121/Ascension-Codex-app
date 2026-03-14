@@ -36,13 +36,11 @@ export default function DnaVisualizationPage() {
   const strandInfo = selectedStrand ? DNA_STRAND_DATA[selectedStrand] : null;
 
   return (
-    <div className="min-h-screen bg-cosmic-950 text-white overflow-hidden relative selection:bg-sacred-gold/30">
+    <div className="min-h-screen bg-anti-bg font-anti-mono text-anti-static overflow-hidden relative selection:bg-anti-acid/30">
         
-      {/* Background Ambience (similar to source app but using existing app patterns) */}
       <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,1)_0%,rgba(0,0,0,1)_100%)]" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-3xl animate-pulse-slow" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl animate-pulse-slow delay-1000" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-anti-acid/[0.02] blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-anti-neon/[0.02] blur-[120px]" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
@@ -61,17 +59,18 @@ export default function DnaVisualizationPage() {
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-flex items-center justify-center p-3 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm mb-4"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-anti-acid/20 mb-4 bg-anti-void/60 backdrop-blur-sm"
                 >
-                  <Sparkles className="w-6 h-6 text-sacred-gold mr-2" />
-                  <span className="text-sacred-gold font-medium tracking-wider">INTERACTIVE STUDIO</span>
+                  <Sparkles className="w-4 h-4 text-anti-acid mr-2" />
+                  <span className="text-[10px] text-anti-acid tracking-[0.3em] uppercase">INTERACTIVE.STUDIO</span>
                 </motion.div>
                 
-                <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 font-sacred">
-                  DNA Visualization Studio
+                <h1 className="text-5xl md:text-7xl font-anti-display tracking-[0.1em] text-anti-static uppercase mb-4 leading-tight">
+                  DNA VISUALIZATION<br/>
+                  <span className="text-anti-acid">STUDIO</span>
                 </h1>
                 
-                <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                <p className="text-xs text-anti-static/40 max-w-2xl mx-auto leading-relaxed tracking-wide">
                   Explore the multidimensional architecture of consciousness from the biological double helix to the 12-strand Diamond Sun template.
                 </p>
               </header>
@@ -88,24 +87,24 @@ export default function DnaVisualizationPage() {
                       whileTap={{ scale: 0.98 }}
                     >
                       <Card 
-                        className="h-full bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer backdrop-blur-md overflow-hidden group"
+                        className="h-full border border-anti-acid/10 bg-anti-void/60 hover:border-anti-acid/30 transition-all cursor-pointer backdrop-blur-md overflow-hidden group rounded-none"
                         onClick={() => handleSelectStrand(strand)}
                       >
                         <div className="p-6 relative">
                             {/* Background Gradient for Card */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-anti-acid/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                             
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center font-bold text-xl text-white shadow-lg group-hover:shadow-sacred-gold/20 transition-shadow">
+                                <div className="w-12 h-12 border border-anti-acid/20 bg-anti-void/40 flex items-center justify-center font-anti-display text-2xl text-anti-acid group-hover:border-anti-acid/50 transition-colors">
                                     {strand}
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-white group-hover:text-sacred-gold transition-colors">{data.name}</h3>
-                                    <p className="text-xs text-gray-400 uppercase tracking-widest">{data.dimensions}</p>
+                                    <h3 className="text-sm font-anti-mono tracking-widest text-anti-static uppercase group-hover:text-anti-acid transition-colors">{data.name}</h3>
+                                    <p className="text-[9px] text-anti-static/40 uppercase tracking-[0.3em] mt-1">{data.dimensions}</p>
                                 </div>
                             </div>
                             
-                            <p className="text-sm text-gray-300 line-clamp-2 leading-relaxed">
+                            <p className="text-[11px] text-anti-static/30 line-clamp-2 leading-relaxed">
                                 {data.description}
                             </p>
                         </div>
@@ -124,20 +123,20 @@ export default function DnaVisualizationPage() {
               className="h-[calc(100vh-100px)] flex flex-col"
             >
               {/* Detail Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-anti-acid/10">
                 <Button 
                     variant="ghost" 
                     onClick={handleBack}
-                    className="group hover:bg-white/10 text-gray-300 hover:text-white"
+                    className="group hover:bg-anti-acid/5 text-anti-static/40 hover:text-anti-acid rounded-none border border-transparent hover:border-anti-acid/30 tracking-widest uppercase text-xs font-anti-mono"
                 >
-                    <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-                    Back to Studio
+                    <ArrowLeft className="w-3 h-3 mr-2 group-hover:-translate-x-1 transition-transform" />
+                    BACK_TO_STUDIO
                 </Button>
                 <div className="text-right">
-                    <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sacred-gold to-white">
+                    <h2 className="text-2xl md:text-4xl font-anti-display tracking-[0.1em] text-anti-static uppercase">
                         {strandInfo?.name}
                     </h2>
-                    <p className="text-sm text-gray-400">{strandInfo?.scientificType}</p>
+                    <p className="text-[10px] text-anti-acid/60 tracking-[0.3em] uppercase mt-1">{strandInfo?.scientificType}</p>
                 </div>
               </div>
 
@@ -145,63 +144,63 @@ export default function DnaVisualizationPage() {
               <div className="flex-1 grid lg:grid-cols-12 gap-6 min-h-0">
                 
                 {/* 3D Visualization Column */}
-                <div className="lg:col-span-8 bg-black/20 rounded-3xl border border-white/10 overflow-hidden relative backdrop-blur-sm flex flex-col">
-                    <div className="absolute top-4 left-4 z-10 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/5 text-xs text-gray-300 flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-green-400" />
-                        Interactive 3D View
+                <div className="lg:col-span-8 bg-anti-void/60 border border-anti-acid/10 overflow-hidden relative flex flex-col min-h-[400px]">
+                    <div className="absolute top-4 left-4 z-10 bg-anti-void/80 border border-anti-acid/20 px-3 py-1 text-[9px] text-anti-acid/60 tracking-widest uppercase flex items-center gap-2">
+                        <Activity className="w-3 h-3 text-anti-acid animate-pulse" />
+                        INTERACTIVE_3D_VIEW
                     </div>
-                    <div className="flex-1 w-full h-full min-h-[400px]">
+                    <div className="flex-1 w-full h-full">
                         <DnaVisualizationCanvas strandCount={selectedStrand} />
                     </div>
                 </div>
 
                 {/* Info Panel Column */}
-                <div className="lg:col-span-4 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="lg:col-span-4 space-y-4 overflow-y-auto pr-2 anti-scrollbar">
                     
                     {/* Key Stats Card */}
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-md">
-                        <div className="p-5 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                    <Card className="bg-anti-void/60 border-anti-acid/10 rounded-none">
+                        <div className="p-6 space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div>
-                                    <label className="text-xs text-gray-500 uppercase tracking-wider">Dimension</label>
-                                    <p className="text-sm font-medium text-blue-300">{strandInfo?.dimensions}</p>
+                                    <label className="text-[9px] text-anti-static/40 uppercase tracking-[0.3em] block mb-2 border-b border-anti-acid/10 pb-1">DIMENSION</label>
+                                    <p className="text-xs font-anti-mono text-anti-cyan uppercase">{strandInfo?.dimensions}</p>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-500 uppercase tracking-wider">Chakras</label>
-                                    <p className="text-sm font-medium text-purple-300">{strandInfo?.chakras}</p>
+                                    <label className="text-[9px] text-anti-static/40 uppercase tracking-[0.3em] block mb-2 border-b border-anti-acid/10 pb-1">CHAKRAS</label>
+                                    <p className="text-xs font-anti-mono text-anti-neon uppercase">{strandInfo?.chakras}</p>
                                 </div>
                             </div>
-                            <div className="pt-4 border-t border-white/5">
-                                <label className="text-xs text-gray-500 uppercase tracking-wider">Consciousness Level</label>
-                                <p className="text-base text-white">{strandInfo?.consciousness}</p>
+                            <div className="pt-4 border-t border-anti-acid/10">
+                                <label className="text-[9px] text-anti-static/40 uppercase tracking-[0.3em] block mb-2 border-b border-anti-acid/10 pb-1">CONSCIOUSNESS_LEVEL</label>
+                                <p className="text-xs font-anti-mono text-anti-acid uppercase">{strandInfo?.consciousness}</p>
                             </div>
                         </div>
                     </Card>
 
                     {/* Description */}
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-md">
-                        <div className="p-5">
-                            <h3 className="flex items-center gap-2 text-sacred-gold font-medium mb-3">
-                                <Info className="w-4 h-4" />
-                                Description
+                    <Card className="bg-anti-void/60 border-anti-acid/10 rounded-none">
+                        <div className="p-6">
+                            <h3 className="flex items-center gap-3 text-anti-static font-anti-mono text-[10px] tracking-[0.3em] uppercase mb-4 border-b border-anti-acid/10 pb-2">
+                                <Info className="w-3 h-3 text-anti-acid" />
+                                DESCRIPTION
                             </h3>
-                            <p className="text-gray-300 leading-relaxed text-sm">
+                            <p className="text-anti-static/40 leading-relaxed text-[11px] font-anti-mono tracking-wide">
                                 {strandInfo?.description}
                             </p>
                         </div>
                     </Card>
 
                     {/* Key Points */}
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-md">
-                        <div className="p-5">
-                            <h3 className="flex items-center gap-2 text-green-400 font-medium mb-3">
-                                <Zap className="w-4 h-4" />
-                                Activation Keys
+                    <Card className="bg-anti-void/60 border-anti-acid/10 rounded-none">
+                        <div className="p-6">
+                            <h3 className="flex items-center gap-3 text-anti-static font-anti-mono text-[10px] tracking-[0.3em] uppercase mb-4 border-b border-anti-acid/10 pb-2">
+                                <Zap className="w-3 h-3 text-anti-neon" />
+                                ACTIVATION_KEYS
                             </h3>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                                 {strandInfo?.keyPoints.map((point, idx) => (
-                                    <li key={idx} className="flex gap-3 text-sm text-gray-300">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
+                                    <li key={idx} className="flex gap-3 text-[11px] text-anti-static/40 font-anti-mono leading-relaxed">
+                                        <span className="text-anti-acid text-[8px] mt-0.5 opacity-60">[{idx + 1}]</span>
                                         {point}
                                     </li>
                                 ))}
@@ -210,10 +209,13 @@ export default function DnaVisualizationPage() {
                     </Card>
 
                     {/* Energetic Synthesis */}
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-md">
-                        <div className="p-5">
-                            <h3 className="text-purple-400 font-medium mb-2 text-sm uppercase tracking-wide">Energetic Synthesis</h3>
-                            <p className="text-xs text-gray-400 leading-relaxed">
+                    <Card className="bg-anti-void/60 border-anti-acid/10 rounded-none">
+                        <div className="p-6">
+                            <h3 className="text-anti-static font-anti-mono text-[10px] tracking-[0.3em] uppercase mb-4 border-b border-anti-acid/10 pb-2 flex items-center gap-3">
+                                <span className="w-1.5 h-1.5 bg-anti-cyan animate-pulse"/>
+                                ENERGETIC_SYNTHESIS
+                            </h3>
+                            <p className="text-[10px] text-anti-static/30 leading-relaxed font-anti-mono tracking-widest border-l-2 border-anti-acid/20 pl-4">
                                 {strandInfo?.energeticSynthesis}
                             </p>
                         </div>

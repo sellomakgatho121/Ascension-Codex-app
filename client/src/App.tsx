@@ -14,6 +14,8 @@ import { SpiritualProgressProvider } from "@/lib/spiritual-progress-context";
 import { AnimatePresence } from "framer-motion";
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper";
 import { AmbientBackground } from "@/components/ambient-background";
+import { AntiCursor } from "@/components/anti-design/custom-cursor";
+import { AntiScrollIndicator } from "@/components/anti-design/scroll-indicator";
 
 // Pages
 import HomePage from "@/pages/home";
@@ -62,14 +64,17 @@ import EnhancedToolsPage from './pages/enhanced-tools';
 
 function Router() {
   return (
-    <div className="relative min-h-screen mobile-min-vh-fix bg-cosmic-900 no-overscroll selection:bg-sacred-gold/30 selection:text-white">
+    <div className="relative min-h-screen mobile-min-vh-fix bg-anti-bg no-overscroll selection:bg-anti-acid/30 selection:text-anti-static anti-scrollbar">
       <AmbientBackground />
-      {/* Desktop Navigation */}
+      <AntiCursor />
+      <AntiScrollIndicator />
+      <div className="anti-noise-overlay" />
+      <div className="anti-scan-line" />
+
       <div className="hidden md:block">
         <Navigation />
       </div>
 
-      {/* Mobile Navigation */}
       <div className="md:hidden">
         <MobileNavigation />
       </div>

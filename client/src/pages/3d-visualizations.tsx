@@ -69,19 +69,11 @@ export default function Visualizations3DPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cosmic-900 text-white">
-      {/* Hero Section */}
-      <section className="cosmic-gradient py-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 border-2 border-sacred-gold rounded-full transform rotate-45"></div>
-          <div className="absolute top-3/4 right-1/4 w-24 h-24 border-2 border-sacred-silver opacity-50"></div>
-          <div className="absolute top-1/2 left-1/2 w-40 h-40 border border-sacred-gold/30 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
-          {/* 3D symbols */}
-          <div className="absolute top-1/3 right-1/3 flex items-center space-x-2 opacity-20">
-            <Atom className="w-8 h-8 text-blue-400" />
-            <Layers className="w-8 h-8 text-purple-400" />
-            <Star className="w-8 h-8 text-yellow-400" />
-          </div>
+    <div className="min-h-screen bg-anti-bg text-anti-static font-anti-mono">
+      <section className="relative py-16 overflow-hidden">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-anti-acid/[0.02] blur-[120px]"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-anti-neon/[0.02] blur-[120px]"></div>
         </div>
         
         <div className="container mx-auto px-4 text-center relative z-10">
@@ -89,25 +81,25 @@ export default function Visualizations3DPage() {
             <Button 
               onClick={() => window.history.back()}
               variant="ghost" 
-              className="mb-6 text-cosmic-200 hover:text-sacred-gold"
+              className="mb-6 text-anti-static/40 hover:text-anti-acid rounded-none border border-transparent hover:border-anti-acid/30 tracking-widest uppercase text-xs"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Tools
+              <ArrowLeft className="w-3 h-3 mr-2" />
+              BACK_TO_TOOLS
             </Button>
 
             <div className="flex items-center justify-center space-x-4 mb-6">
-              <div className="p-4 rounded-full bg-sacred-gold/20 border-2 border-sacred-gold">
-                <Atom className="w-12 h-12 text-sacred-gold" />
+              <div className="p-3 bg-anti-void/60 border border-anti-acid/20">
+                <Atom className="w-8 h-8 text-anti-acid" />
               </div>
               <div>
-                <h1 className="text-4xl md:text-6xl font-sacred font-bold text-sacred-gold">
-                  3D Visualizations
+                <h1 className="text-4xl md:text-6xl font-anti-display tracking-[0.1em] text-anti-static uppercase">
+                  3D VISUALIZATIONS
                 </h1>
-                <p className="text-xl text-cosmic-100 mt-2">Immersive Consciousness Exploration</p>
+                <p className="text-sm text-anti-acid/60 mt-2 tracking-widest uppercase font-anti-mono">Immersive Consciousness Exploration</p>
               </div>
             </div>
             
-            <p className="text-xl md:text-2xl mb-8 text-cosmic-100 leading-relaxed">
+            <p className="text-sm md:text-base mb-8 text-anti-static/40 leading-relaxed max-w-2xl mx-auto border-l-2 border-anti-acid/20 pl-4 text-left">
               Experience consciousness layers, chakra systems, and energy fields in interactive 3D space
             </p>
             
@@ -116,22 +108,24 @@ export default function Visualizations3DPage() {
                 <button
                   key={viz.id}
                   onClick={() => setSelectedVisualization(viz.id)}
-                  className="text-center hover:scale-105 transition-transform"
-                >
-                  <div className={`p-4 rounded-full border-2 mx-auto w-16 h-16 flex items-center justify-center mb-4 ${
+                  className={`text-left border p-4 transition-all duration-300 ${
                     selectedVisualization === viz.id 
-                      ? 'border-sacred-gold bg-sacred-gold/20' 
-                      : 'border-cosmic-500/30 bg-cosmic-500/10'
+                      ? 'border-anti-acid bg-anti-acid/10' 
+                      : 'border-anti-acid/10 bg-anti-void/40 hover:border-anti-acid/30'
+                  }`}
+                >
+                  <div className={`w-10 h-10 border flex items-center justify-center mb-4 transition-colors ${
+                    selectedVisualization === viz.id 
+                      ? 'border-anti-acid text-anti-acid' 
+                      : 'border-anti-acid/20 text-anti-static/40'
                   }`}>
-                    <div className={selectedVisualization === viz.id ? 'text-sacred-gold' : 'text-cosmic-400'}>
-                      {viz.icon}
-                    </div>
+                    {viz.icon}
                   </div>
-                  <h3 className="text-sm font-semibold text-white mb-2">{viz.title}</h3>
-                  <p className="text-cosmic-300 text-xs mb-2 line-clamp-2">{viz.description}</p>
-                  <div className="flex flex-wrap justify-center gap-1">
+                  <h3 className="text-xs font-anti-mono tracking-widest text-anti-static uppercase mb-2">{viz.title}</h3>
+                  <p className="text-anti-static/30 text-[10px] mb-3 line-clamp-2 leading-relaxed">{viz.description}</p>
+                  <div className="flex flex-wrap gap-1">
                     {viz.features.slice(0, 1).map((feature) => (
-                      <Badge key={feature} variant="outline" className="text-xs border-cosmic-500/30">
+                      <Badge key={feature} variant="outline" className="text-[9px] border-anti-acid/20 text-anti-acid/60 rounded-none uppercase">
                         {feature}
                       </Badge>
                     ))}
@@ -143,30 +137,29 @@ export default function Visualizations3DPage() {
         </div>
       </section>
 
-      {/* System Requirements */}
-      <section className="py-8 bg-cosmic-900">
+      <section className="py-8 bg-anti-bg border-t border-anti-acid/10">
         <div className="container mx-auto px-4">
-          <Card className="sacred-card mb-8">
-            <CardHeader>
-              <CardTitle className="text-lg font-sacred text-sacred-gold flex items-center">
-                <Settings className="w-5 h-5 mr-2" />
-                System Requirements
+          <Card className="border border-anti-acid/10 bg-anti-void/60 rounded-none mb-8">
+            <CardHeader className="border-b border-anti-acid/10 bg-anti-void/40 p-4">
+              <CardTitle className="text-sm font-anti-mono tracking-widest text-anti-acid uppercase flex items-center">
+                <Settings className="w-4 h-4 mr-2" />
+                SYSTEM_REQUIREMENTS
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-4 gap-4">
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-4 gap-6">
                 {systemRequirements.map((req, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-sm">
-                    <div className="text-cosmic-400">
+                  <div key={index} className="flex items-center space-x-3 text-xs">
+                    <div className="text-anti-acid/60">
                       {req.icon}
                     </div>
-                    <span className="text-cosmic-200">{req.label}</span>
+                    <span className="text-anti-static/60 uppercase tracking-wide">{req.label}</span>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <p className="text-blue-200 text-sm">
-                  <Eye className="w-4 h-4 inline mr-2" />
+              <div className="mt-6 p-4 border border-anti-acid/20 bg-anti-acid/5 flex items-start">
+                <Eye className="w-4 h-4 text-anti-acid mr-3 mt-0.5 shrink-0" />
+                <p className="text-anti-acid/70 text-xs leading-relaxed uppercase tracking-wider">
                   For optimal experience, use a desktop or laptop with hardware-accelerated graphics.
                   Mobile devices may experience reduced performance.
                 </p>
