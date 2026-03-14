@@ -10,10 +10,10 @@ export function FloatingMeditationButton() {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 md:bottom-6 right-6 md:right-24 w-14 h-14 rounded-full sacred-button shadow-lg z-50 hover:scale-110 transition-transform duration-300"
+        className="fixed bottom-20 md:bottom-6 right-[5.5rem] md:right-24 w-12 h-12 bg-[#7b2dff] hover:bg-[#7b2dff]/80 text-white shadow-lg z-50 hover:scale-110 transition-transform duration-300"
         size="lg"
       >
-        <Play className="w-6 h-6" />
+        <Play className="w-5 h-5" />
       </Button>
       
       <MeditationModal isOpen={isOpen} onClose={() => setIsOpen(false)} />

@@ -1,0 +1,37 @@
+
+> rest-express@1.0.0 dev
+> cross-env NODE_ENV=development tsx server/index.ts
+
+WARNING: DATABASE_URL is not set. Database features will fail. Proceeding in offline/demo mode.
+10:18:40 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 17 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+⚠️ Database connection failed, falling back to MemStorage
+Database error: Unknown error
+10:25:49 PM [express] GET /api/content 200 in 1216ms :: [{"id":1,"type":"chakra","category":"physical…
+10:25:49 PM [express] GET /api/progress 200 in 1694ms
+10:58:46 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+10:59:42 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+10:59:54 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+10:59:55 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:00:25 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:00:27 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:00:29 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:00:31 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:00:33 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:38 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:39 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:40 PM [vite] hmr update /src/components/onboarding-tour.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:41 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:42 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:43 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:44 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:01:46 PM [vite] hmr update /src/components/onboarding-system.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:42:31 PM [vite] hmr update /src/App.tsx?v=1i0pMUh1ijCZBjMwOujTk, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:42:57 PM [vite] hmr update /src/App.tsx?v=1i0pMUh1ijCZBjMwOujTk, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:43:03 PM [express] GET /api/progress 200 in 232ms
+11:46:19 PM [vite] hmr update /src/pages/enhanced-vers.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:46:21 PM [vite] hmr update /src/pages/vers-assistant.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:46:26 PM [vite] hmr update /src/components/floating-meditation-button.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk
+11:46:45 PM [vite] hmr update /src/pages/enhanced-vers.tsx, /src/index.css?v=1i0pMUh1ijCZBjMwOujTk

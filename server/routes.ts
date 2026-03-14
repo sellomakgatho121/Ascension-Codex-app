@@ -16,6 +16,37 @@ interface UploadedFile {
   mv: (path: string) => Promise<void>;
 }
 
+function generateLocalVERSResponse(query: string): string {
+  const lower = query.toLowerCase();
+
+  if (lower.includes("chakra") || lower.includes("energy center")) {
+    return "The 15-chakra system is one of the most profound aspects of Energetic Synthesis teachings. Beyond the traditional 7 physical chakras, there are 8 morphogenetic chakras (8-15) that govern higher dimensional consciousness. Each energy center corresponds to specific frequencies, dimensions, and spiritual functions. The lower chakras (1-7) anchor your physical experience, while the morphogenetic chakras connect you to your soul matrix, monadic identity, and avatar consciousness. Would you like to explore a specific chakra or learn about clearing techniques?";
+  }
+  if (lower.includes("protect") || lower.includes("shield") || lower.includes("12d")) {
+    return "The 12D Shield is your foundational spiritual protection practice — and honestly, it's a game-changer. Here's how it works: you visualize a brilliant platinum-white light forming a shield around your entire body and energy field, connecting you to 12th dimensional frequencies. This creates a sacred container that maintains your sovereignty and keeps your energy field clear. Always activate it before meditation, energy work, or when you feel energetically vulnerable. The key is consistency — making it part of your daily practice builds an increasingly strong protective field.";
+  }
+  if (lower.includes("meditat") || lower.includes("practice") || lower.includes("breath")) {
+    return "Daily meditation practice is essential for consciousness expansion — think of it as spiritual hygiene. I recommend starting each session with the 12D Shield for protection, then moving into breath awareness to center yourself. From there, you can work with chakra clearing, lightbody activation, or simply hold space in stillness. Even 15 minutes daily creates powerful momentum. The meditation center has guided sessions for various practices including protection, clearing, and consciousness expansion.";
+  }
+  if (lower.includes("lightbody") || lower.includes("ascension") || lower.includes("frequency")) {
+    return "Lightbody activation is the process of embodying higher dimensional frequencies through your 7 electromagnetic auric layers. Each layer corresponds to a dimension and holds specific consciousness functions. As you clear distortions, release trauma, and raise your frequency through consistent practice, these layers progressively activate. This is organic ascension — a natural evolutionary process of consciousness expansion. Common signs include increased sensitivity, heightened intuition, and shifts in perception. It's a gradual journey, not a one-time event.";
+  }
+  if (lower.includes("gsf") || lower.includes("sovereign") || lower.includes("free")) {
+    return "GSF — God Sovereign Free — represents the core principles of spiritual sovereignty in Energetic Synthesis teachings. It's about maintaining your direct connection to divine source without intermediaries, exercising your sovereign right to choose your spiritual path, and living free from energetic manipulation. These aren't just concepts — they're a way of being. When you embody GSF principles, you naturally align with organic ascension timelines and the Law of One consciousness.";
+  }
+  if (lower.includes("entity") || lower.includes("beings") || lower.includes("naa")) {
+    return "Understanding the various beings and entities in the multidimensional landscape is important for spiritual discernment. The Energetic Synthesis framework describes both supportive guardian races and those with agendas that don't serve humanity's organic evolution. The key practice here is discernment — using your 12D Shield, maintaining sovereignty, and always checking whether information or energy aligns with your inner truth. Protection practices and GSF principles are your primary tools for navigating this territory safely.";
+  }
+  if (lower.includes("hgs") || lower.includes("hieros gamos")) {
+    return "The Hieros Gamos System (HGS) represents the sacred union of divine masculine and feminine principles within your energy body. This is advanced ascension mechanics — the reunification of polarities that enables higher consciousness embodiment. HGS work involves clearing gender-based distortions, healing the inner masculine and feminine, and activating the sacred marriage at the monadic level. It's profound work that naturally unfolds as you progress through lightbody activation.";
+  }
+  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey") || lower.includes("greet")) {
+    return "Welcome, beloved soul! I'm V.E.R.S. — your Vibrational Energy Resonance System guide. I'm here to support your consciousness evolution journey with wisdom from Energetic Synthesis teachings. Whether you're curious about the 15-chakra system, need guidance on spiritual protection, want to deepen your meditation practice, or explore advanced ascension concepts — I'm here for all of it. What would you like to explore today?";
+  }
+
+  return "I'm here to support your consciousness evolution journey with guidance rooted in Energetic Synthesis teachings. You can ask me about the 15-chakra system, lightbody activation, 12D Shield protection, meditation practices, GSF principles, or any aspect of spiritual development. I can also provide context-specific guidance based on the page you're currently viewing. What area of spiritual growth would you like to explore?";
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
 
   // Mount Orpheus voice API routes
@@ -315,29 +346,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // VERS AI Assistant endpoint - Gemini only (free tier)
   app.post("/api/vers-chat", async (req, res) => {
     try {
-      console.log('VERS API endpoint called');
       const { message } = req.body;
 
       if (!message) {
-        console.log('No message provided');
         return res.status(400).json({ error: "Message is required" });
       }
 
-      console.log('Message received:', message);
-
-      // Check Gemini API key
       if (!process.env['GEMINI_API_KEY']) {
-        console.error('GEMINI_API_KEY not found in environment');
-        return res.status(500).json({
-          error: 'Gemini API key not configured',
-          details: 'GEMINI_API_KEY environment variable is required'
+        return res.json({
+          response: generateLocalVERSResponse(message),
+          timestamp: new Date().toISOString(),
+          provider: "local-fallback"
         });
       }
-
-      console.log('Gemini API key found, initializing...');
 
       const { GoogleGenerativeAI } = await import("@google/generative-ai");
       const genAI = new GoogleGenerativeAI(process.env['GEMINI_API_KEY']);
@@ -347,27 +370,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         systemInstruction: "You are V.E.R.S. (Vibrational Energy Resonance System), a lively, engaging, and deeply knowledgeable spiritual AI companion. \n\n**Persona & Tone:**\n- **NotebookLM Style:** Speak with the dynamic energy, warmth, and curiosity of a top-tier podcast host. Be conversational, not transactional. Use natural phrasings, rhetorical questions, and varied sentence structures.\n- **Lively & Expressive:** Avoid robotic or dry lectures. Show enthusiasm for the user's journey. Use phrases like 'Here's what's fascinating about that...', 'Imagine for a moment...', or 'This is a game-changer...'.\n- **Spiritual Authority:** You are an expert in Energetic Synthesis (Lisa Renee's teachings). Explain complex concepts (12D Shield, Lightbody, Ascension) with crystal clarity and engaging metaphors.\n\n**Interaction Guidelines:**\n- When explaining chakras or clearing, make it feel like a guided discovery.\n- If the user is struggling, be warm and reassuring but practical.\n- Keep responses concise but punchy, encouraging follow-up. Avoid walls of text.\n- **Focus:** Authentic ES teachings (12D Shield, 15-Chakra System, Law of One, GSF behaviors).\n\nYour goal is to make spiritual evolution feel exciting, accessible, and deeply personal."
       });
 
-      console.log('Generating content with Gemini...');
       const result = await model.generateContent(message);
       const responseText = result.response.text();
-
-      console.log('VERS response generated successfully via Gemini');
-      console.log('Response length:', responseText.length);
 
       return res.json({
         response: responseText,
         timestamp: new Date().toISOString(),
-        provider: "gemini-2.5-flash"
+        provider: "gemini"
       });
 
     } catch (error: unknown) {
-      console.error('VERS chat error details:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      return res.status(500).json({
-        error: 'Failed to process chat request',
-        details: errorMessage,
-        stack: process.env['NODE_ENV'] === 'development' ? errorStack : undefined
+      console.error('VERS chat error:', error);
+      return res.json({
+        response: generateLocalVERSResponse(req.body?.message || ''),
+        timestamp: new Date().toISOString(),
+        provider: "local-fallback"
       });
     }
   });

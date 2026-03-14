@@ -1,178 +1,73 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useVERS } from "@/lib/vers-context";
 import { Badge } from "@/components/ui/badge";
-import { Brain, MessageCircle, Sparkles, Zap, Settings, Bot } from "lucide-react";
+import { Brain, MessageCircle, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function EnhancedVERSPage() {
-  const [isLoading, setIsLoading] = useState(true);
+  const { openChat } = useVERS();
 
   useEffect(() => {
-    // Simulate loading for demonstration
-    const timer = setTimeout(() => setIsLoading(false), 1000);
+    const timer = setTimeout(() => openChat(), 800);
     return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen mobile-min-vh-fix bg-cosmic-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-2 border-sacred-gold border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-cosmic-300">Loading Enhanced VERS...</p>
-        </div>
-      </div>
-    );
-  }
+  }, [openChat]);
 
   return (
-    <div className="min-h-screen mobile-min-vh-fix bg-cosmic-900 text-white p-4">
+    <div className="min-h-screen mobile-min-vh-fix bg-[#050505] text-white p-4">
       <div className="container mx-auto max-w-6xl">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-12 pt-8"
         >
-          <h1 className="text-4xl md:text-6xl font-sacred font-bold mb-4 text-sacred-gold">
-            Enhanced VERS AI
+          <h1 className="text-5xl md:text-7xl font-anti-display text-[#39ff14] uppercase tracking-wider mb-4">
+            V.E.R.S.
           </h1>
-          <p className="text-xl text-cosmic-100 max-w-3xl mx-auto leading-relaxed mb-4">
-            Advanced Vibrational Energy Resonance System with Enhanced Capabilities
+          <p className="text-lg text-neutral-400 font-anti-mono max-w-3xl mx-auto leading-relaxed mb-6">
+            Vibrational Energy Resonance System — Your AI-powered spiritual guide for consciousness evolution
           </p>
-          
-          <div className="flex justify-center gap-4 text-sm mb-8">
-            <Badge variant="outline" className="border-sacred-gold text-sacred-gold">
-              Gemini 2.5 Flash
+
+          <div className="flex justify-center gap-3 text-sm mb-8">
+            <Badge variant="outline" className="border-[#39ff14]/30 text-[#39ff14] font-anti-mono text-xs uppercase tracking-widest bg-[#39ff14]/5">
+              Gemini Powered
             </Badge>
-            <Badge variant="outline" className="border-cosmic-400 text-cosmic-400">
-              Enhanced Processing
+            <Badge variant="outline" className="border-neutral-700 text-neutral-400 font-anti-mono text-xs uppercase tracking-widest">
+              Context-Aware
             </Badge>
-            <Badge variant="outline" className="border-green-400 text-green-400">
+            <Badge variant="outline" className="border-[#39ff14]/30 text-[#39ff14] font-anti-mono text-xs uppercase tracking-widest bg-[#39ff14]/5">
               Online
             </Badge>
           </div>
+
+          <p className="text-neutral-600 font-anti-mono text-sm">
+            V.E.R.S. is now available site-wide via the floating chat widget in the bottom-right corner.
+          </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Core VERS Features */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="bg-cosmic-800/50 border-cosmic-600 h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Brain className="w-5 h-5 text-sacred-gold" />
-                  <span>Spiritual Intelligence</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-cosmic-300 mb-4">
-                  Advanced AI understanding of Energetic Synthesis teachings, consciousness evolution, and spiritual development.
-                </p>
-                <ul className="text-sm text-cosmic-400 space-y-1">
-                  <li>• 15-Chakra System Guidance</li>
-                  <li>• Lightbody Activation Support</li>
-                  <li>• 12D Shield Protection</li>
-                  <li>• Consciousness Evolution</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Advanced Conversation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="bg-cosmic-800/50 border-cosmic-600 h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageCircle className="w-5 h-5 text-sacred-gold" />
-                  <span>Natural Conversation</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-cosmic-300 mb-4">
-                  Context-aware dialogue with memory, intent recognition, and personalized spiritual guidance.
-                </p>
-                <ul className="text-sm text-cosmic-400 space-y-1">
-                  <li>• Intent Recognition</li>
-                  <li>• Conversation Memory</li>
-                  <li>• Mood Analysis</li>
-                  <li>• Personalized Responses</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Enhanced Features */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="bg-cosmic-800/50 border-cosmic-600 h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Sparkles className="w-5 h-5 text-sacred-gold" />
-                  <span>Advanced Capabilities</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-cosmic-300 mb-4">
-                  Voice interaction, real-time analytics, and adaptive learning for optimal spiritual support.
-                </p>
-                <ul className="text-sm text-cosmic-400 space-y-1">
-                  <li>• Voice Recognition</li>
-                  <li>• Speech Synthesis</li>
-                  <li>• Real-time Analytics</li>
-                  <li>• Adaptive Learning</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { icon: Brain, title: "Spiritual Intelligence", color: "#39ff14", items: ["15-Chakra System Guidance", "Lightbody Activation Support", "12D Shield Protection", "Consciousness Evolution"] },
+            { icon: MessageCircle, title: "Context-Aware Chat", color: "#00f0ff", items: ["Page-Aware Responses", "Conversation Memory", "Intent Recognition", "Personalized Guidance"] },
+            { icon: Sparkles, title: "Always Available", color: "#7b2dff", items: ["Floating Widget on Every Page", "Persistent Across Navigation", "Instant Access Anywhere", "Minimizable Interface"] },
+          ].map((feature, i) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * (i + 1) }}
+              className="bg-[#0a0a0a] border border-neutral-800 p-6 relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#39ff14]/30 to-transparent" />
+              <feature.icon className="w-6 h-6 mb-4" style={{ color: feature.color }} />
+              <h3 className="font-anti-mono font-bold text-[#e8e8e8] uppercase tracking-wide text-sm mb-3">{feature.title}</h3>
+              <ul className="space-y-1.5">
+                {feature.items.map((item) => (
+                  <li key={item} className="text-xs text-neutral-500 font-anti-mono">{item}</li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
-
-        {/* Action Buttons */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-center mt-12"
-        >
-          <div className="space-y-4">
-            <h3 className="text-2xl font-semibold text-cosmic-100 mb-6">
-              Choose Your VERS Experience
-            </h3>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => window.location.href = '/vers'}
-                className="bg-sacred-gold hover:bg-sacred-gold/80 text-cosmic-900 font-semibold py-3 px-6"
-              >
-                <Bot className="w-5 h-5 mr-2" />
-                Advanced Conversational AI
-              </Button>
-              
-              <Button 
-                onClick={() => window.location.href = '/assistant'}
-                variant="outline"
-                className="border-cosmic-600 text-cosmic-300 hover:bg-cosmic-700 py-3 px-6"
-              >
-                <Settings className="w-5 h-5 mr-2" />
-                Classic VERS Assistant
-              </Button>
-            </div>
-
-            <div className="text-sm text-cosmic-400 mt-6">
-              <p>Experience enhanced spiritual guidance with our most advanced AI system</p>
-              <p>Choose Advanced Conversational AI for the full enhanced experience</p>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );

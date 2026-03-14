@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -141,7 +141,7 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
     }
   ];
 
-  const currentTourStep = tourSteps[currentStep];
+  const currentTourStep = tourSteps[currentStep] as TourStep | undefined;
 
   const nextStep = () => {
     if (currentStep < tourSteps.length - 1) {
@@ -173,22 +173,22 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
     setCurrentStep(stepIndex);
   };
 
-  // Navigate to action path
   const handleAction = () => {
-    if (currentTourStep.action) {
+    if (currentTourStep?.action) {
       window.location.href = currentTourStep.action.path;
       onClose();
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !currentTourStep) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-cosmic-800 border-sacred-gold/30" aria-describedby="onboarding-description">
+      <DialogContent className="max-w-2xl bg-[#0a0a0a] border border-neutral-800" aria-describedby="onboarding-description">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#39ff14]/50 to-transparent" />
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-sacred text-sacred-gold flex items-center">
+            <DialogTitle className="text-xl font-anti-display text-[#39ff14] uppercase tracking-wider flex items-center">
               {currentTourStep.icon}
               <span className="ml-3">Guided Tour</span>
             </DialogTitle>
@@ -196,14 +196,14 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
               <p id="onboarding-description">Interactive guided tour to introduce Ascension Codex platform features</p>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-cosmic-300 border-cosmic-500">
+              <Badge variant="outline" className="border border-[#39ff14]/30 text-[#39ff14] font-anti-mono text-xs uppercase tracking-widest bg-[#39ff14]/5">
                 {currentStep + 1} of {tourSteps.length}
               </Badge>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={skipTour}
-                className="text-cosmic-400 hover:text-white"
+                className="text-neutral-500 hover:text-[#39ff14]"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -212,7 +212,6 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Progress Dots */}
           <div className="flex justify-center space-x-2">
             {tourSteps.map((_, index) => (
               <button
@@ -220,41 +219,41 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
                 onClick={() => goToStep(index)}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   index === currentStep 
-                    ? 'bg-sacred-gold w-8' 
+                    ? 'bg-[#39ff14] w-8' 
                     : index < currentStep 
-                    ? 'bg-sacred-gold/60' 
-                    : 'bg-cosmic-600'
+                    ? 'bg-[#39ff14]/60' 
+                    : 'bg-neutral-700'
                 }`}
               />
             ))}
           </div>
 
-          {/* Main Content */}
-          <Card className="sacred-card">
+          <Card className="bg-[#0a0a0a] border border-neutral-800 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#39ff14]/30 to-transparent" />
             <CardContent className="p-8 text-center">
               {isCompleted ? (
                 <div className="space-y-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold/20 flex items-center justify-center">
-                    <Star className="w-8 h-8 text-sacred-gold animate-pulse" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-sm bg-[#39ff14]/10 border border-[#39ff14]/30 flex items-center justify-center">
+                    <Star className="w-8 h-8 text-[#39ff14] animate-pulse" />
                   </div>
-                  <h3 className="text-2xl font-sacred text-sacred-gold">Welcome to Your Journey!</h3>
-                  <p className="text-cosmic-100">
+                  <h3 className="text-2xl font-anti-display text-[#39ff14] uppercase tracking-wider">Welcome to Your Journey!</h3>
+                  <p className="text-[#e8e8e8] font-anti-mono text-sm">
                     You're ready to begin exploring consciousness evolution through Ascension Codex's comprehensive teachings.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold/20 flex items-center justify-center">
-                    <div className="text-sacred-gold">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-sm bg-[#39ff14]/10 border border-[#39ff14]/30 flex items-center justify-center">
+                    <div className="text-[#39ff14]">
                       {currentTourStep.icon}
                     </div>
                   </div>
                   
                   <div>
-                    <h3 className="text-2xl font-sacred text-sacred-gold mb-4">
+                    <h3 className="text-2xl font-anti-mono font-bold text-[#e8e8e8] uppercase tracking-wide mb-4">
                       {currentTourStep.title}
                     </h3>
-                    <p className="text-cosmic-100 leading-relaxed">
+                    <p className="text-neutral-400 font-anti-mono text-sm leading-relaxed">
                       {currentTourStep.description}
                     </p>
                   </div>
@@ -262,7 +261,7 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
                   {currentTourStep.action && (
                     <Button
                       onClick={handleAction}
-                      className="sacred-button"
+                      className="bg-[#39ff14] text-black font-anti-mono font-bold uppercase tracking-wider hover:bg-[#39ff14]/80"
                     >
                       {currentTourStep.action.label}
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -273,14 +272,13 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
             </CardContent>
           </Card>
 
-          {/* Navigation */}
           {!isCompleted && (
             <div className="flex justify-between items-center">
               <Button
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 0}
-                className="border-cosmic-500 text-cosmic-500 hover:bg-cosmic-500 hover:text-white disabled:opacity-50"
+                className="border border-neutral-700 text-neutral-400 font-anti-mono uppercase tracking-wider hover:border-[#39ff14]/50 hover:text-[#39ff14] disabled:opacity-50"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Previous
@@ -289,14 +287,14 @@ export function OnboardingTour({ isOpen, onClose, onComplete }: OnboardingTourPr
               <Button
                 variant="outline"
                 onClick={skipTour}
-                className="text-cosmic-400 border-cosmic-600 hover:bg-cosmic-600 hover:text-white"
+                className="border border-neutral-700 text-neutral-500 font-anti-mono uppercase tracking-wider hover:border-[#39ff14]/50 hover:text-[#39ff14]"
               >
                 Skip Tour
               </Button>
 
               <Button
                 onClick={nextStep}
-                className="sacred-button"
+                className="bg-[#39ff14] text-black font-anti-mono font-bold uppercase tracking-wider hover:bg-[#39ff14]/80"
               >
                 {currentStep === tourSteps.length - 1 ? 'Complete' : 'Next'}
                 <ArrowRight className="w-4 h-4 ml-2" />

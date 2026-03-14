@@ -1,5 +1,15 @@
-import { VERSAIAssistant } from '../components/vers-ai-assistant';
+import { useEffect } from "react";
+import { useLocation } from "wouter";
+import { useVERS } from "@/lib/vers-context";
 
 export default function VERSAssistantPage() {
-  return <VERSAIAssistant />;
+  const [, setLocation] = useLocation();
+  const { openChat } = useVERS();
+
+  useEffect(() => {
+    openChat();
+    setLocation("/");
+  }, [openChat, setLocation]);
+
+  return null;
 }

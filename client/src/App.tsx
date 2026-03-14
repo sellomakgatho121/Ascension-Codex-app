@@ -16,6 +16,8 @@ import { PageTransitionWrapper } from "@/components/page-transition-wrapper";
 import { AmbientBackground } from "@/components/ambient-background";
 import { AntiCursor } from "@/components/anti-design/custom-cursor";
 import { AntiScrollIndicator } from "@/components/anti-design/scroll-indicator";
+import { VERSProvider } from "@/lib/vers-context";
+import { VERSFloatingWidget } from "@/components/vers-floating-widget";
 
 // Pages
 import HomePage from "@/pages/home";
@@ -318,11 +320,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <SpiritualProgressProvider>
-          <Router />
-          <AccessibilityProvider />
-          <OnboardingSystem />
-          <AscensionFooter />
-          <Toaster />
+          <VERSProvider>
+            <Router />
+            <VERSFloatingWidget />
+            <AccessibilityProvider />
+            <OnboardingSystem />
+            <AscensionFooter />
+            <Toaster />
+          </VERSProvider>
         </SpiritualProgressProvider>
       </TooltipProvider>
     </QueryClientProvider>
