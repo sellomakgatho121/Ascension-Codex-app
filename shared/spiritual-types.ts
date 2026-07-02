@@ -228,7 +228,7 @@ export function createSpiritualPractice<T extends SpiritualLevel>(
 export function createVERSResponse<T extends SpiritualLevel>(
   guidance: string,
   context: VERSSpiritualContext,
-  level: T
+  _level: T
 ): VERSSpiritualResponse<T> {
   return {
     guidance,

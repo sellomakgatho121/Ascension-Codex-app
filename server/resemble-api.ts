@@ -26,7 +26,7 @@ interface VoiceSynthesisRequest {
 // Generate spiritual voice synthesis using Resemble.ai
 export async function generateSpiritualVoice(req: Request, res: Response) {
   try {
-    const { text, voiceProfile, spiritualContext }: VoiceSynthesisRequest = req.body;
+    const { text, voiceProfile }: VoiceSynthesisRequest = req.body;
 
     if (!text?.trim()) {
       return res.status(400).json({

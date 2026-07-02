@@ -211,6 +211,19 @@ var db = drizzle({ client: pool, schema: schema_exports });
 
 // server/storage.ts
 import { eq, and, desc, sql } from "drizzle-orm";
+var emptyChakraProgress = () => ({
+  physicalChakras: [],
+  morphogeneticChakras: [],
+  completedChakras: []
+});
+var emptyLightbodyProgress = () => ({
+  activatedLayers: [],
+  integrationLevel: 0
+});
+var emptyGridProgress = () => ({
+  activatedSpheres: [],
+  shieldIntegration: []
+});
 var DatabaseStorage = class {
   async getUser(id) {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -245,9 +258,9 @@ var DatabaseStorage = class {
     } else {
       return await this.createUserProgress({
         userId,
-        chakraProgress: progressUpdate.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-        lightbodyProgress: progressUpdate.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-        gridProgress: progressUpdate.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+        chakraProgress: progressUpdate.chakraProgress || emptyChakraProgress(),
+        lightbodyProgress: progressUpdate.lightbodyProgress || emptyLightbodyProgress(),
+        gridProgress: progressUpdate.gridProgress || emptyGridProgress(),
         overallLevel: progressUpdate.overallLevel || 0
       });
     }
@@ -255,9 +268,9 @@ var DatabaseStorage = class {
   async createUserProgress(progress) {
     const insertData = {
       userId: progress.userId,
-      chakraProgress: progress.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-      lightbodyProgress: progress.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-      gridProgress: progress.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+      chakraProgress: progress.chakraProgress || emptyChakraProgress(),
+      lightbodyProgress: progress.lightbodyProgress || emptyLightbodyProgress(),
+      gridProgress: progress.gridProgress || emptyGridProgress(),
       overallLevel: progress.overallLevel || 0
     };
     const [newProgress] = await db.insert(userProgress).values(insertData).returning();
@@ -325,9 +338,13 @@ var DatabaseStorage = class {
   }
   async createForumPost(post) {
     const [newPost] = await db.insert(forumPosts).values({
-      ...post,
-      createdAt: /* @__PURE__ */ new Date(),
-      updatedAt: /* @__PURE__ */ new Date()
+      title: post.title,
+      content: post.content,
+      category: post.category,
+      tags: post.tags || null,
+      authorId: post.authorId ?? 1,
+      likes: 0,
+      replies: 0
     }).returning();
     if (!newPost) throw new Error("Failed to create forum post");
     return newPost;
@@ -352,8 +369,16 @@ var DatabaseStorage = class {
   }
   async createGroupSession(session) {
     const [newSession] = await db.insert(groupSessions).values({
-      ...session,
-      createdAt: /* @__PURE__ */ new Date()
+      title: session.title,
+      type: session.type,
+      description: session.description,
+      maxParticipants: session.maxParticipants,
+      scheduledTime: session.scheduledTime,
+      duration: session.duration,
+      level: session.level,
+      hostId: session.hostId ?? 1,
+      participants: 0,
+      isActive: 1
     }).returning();
     if (!newSession) throw new Error("Failed to create group session");
     return newSession;
@@ -398,8 +423,10 @@ var DatabaseStorage = class {
   }
   async createPostReaction(reaction) {
     const [newReaction] = await db.insert(postReactions).values({
-      ...reaction,
-      createdAt: /* @__PURE__ */ new Date()
+      postId: reaction.postId,
+      type: reaction.type,
+      content: reaction.content || null,
+      userId: reaction.userId ?? 1
     }).returning();
     if (!newReaction) throw new Error("Failed to create post reaction");
     return newReaction;
@@ -662,22 +689,25 @@ var MemStorage = class {
     const existingIndex = this.userProgress.findIndex((p) => p.userId === userId);
     if (existingIndex >= 0) {
       const existing = this.userProgress[existingIndex];
+      if (!existing) {
+        throw new Error("User progress not found");
+      }
       const updated = {
         ...existing,
         lastUpdated: /* @__PURE__ */ new Date(),
-        ...progressUpdate.chakraProgress && { chakraProgress: progressUpdate.chakraProgress },
-        ...progressUpdate.lightbodyProgress && { lightbodyProgress: progressUpdate.lightbodyProgress },
-        ...progressUpdate.gridProgress && { gridProgress: progressUpdate.gridProgress },
-        ...progressUpdate.overallLevel !== void 0 && { overallLevel: progressUpdate.overallLevel }
+        chakraProgress: progressUpdate.chakraProgress ?? existing.chakraProgress,
+        lightbodyProgress: progressUpdate.lightbodyProgress ?? existing.lightbodyProgress,
+        gridProgress: progressUpdate.gridProgress ?? existing.gridProgress,
+        overallLevel: progressUpdate.overallLevel ?? existing.overallLevel
       };
       this.userProgress[existingIndex] = updated;
       return updated;
     } else {
       return await this.createUserProgress({
         userId,
-        chakraProgress: progressUpdate.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-        lightbodyProgress: progressUpdate.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-        gridProgress: progressUpdate.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+        chakraProgress: progressUpdate.chakraProgress || emptyChakraProgress(),
+        lightbodyProgress: progressUpdate.lightbodyProgress || emptyLightbodyProgress(),
+        gridProgress: progressUpdate.gridProgress || emptyGridProgress(),
         overallLevel: progressUpdate.overallLevel || 0
       });
     }
@@ -686,9 +716,9 @@ var MemStorage = class {
     const newProgress = {
       id: this.nextId.userProgress++,
       userId: progress.userId,
-      chakraProgress: progress.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-      lightbodyProgress: progress.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-      gridProgress: progress.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+      chakraProgress: progress.chakraProgress ?? emptyChakraProgress(),
+      lightbodyProgress: progress.lightbodyProgress ?? emptyLightbodyProgress(),
+      gridProgress: progress.gridProgress ?? emptyGridProgress(),
       overallLevel: progress.overallLevel || 0,
       lastUpdated: /* @__PURE__ */ new Date()
     };
@@ -782,9 +812,16 @@ var MemStorage = class {
     if (index === -1) {
       throw new Error("Forum post not found");
     }
+    const existing = this.forumPosts[index];
+    if (!existing) {
+      throw new Error("Forum post not found");
+    }
     const updated = {
-      ...this.forumPosts[index],
-      ...updates,
+      ...existing,
+      title: updates.title ?? existing.title,
+      content: updates.content ?? existing.content,
+      category: updates.category ?? existing.category,
+      tags: updates.tags ?? existing.tags,
       updatedAt: /* @__PURE__ */ new Date()
     };
     this.forumPosts[index] = updated;
@@ -832,7 +869,21 @@ var MemStorage = class {
     if (index === -1) {
       throw new Error("Group session not found");
     }
-    const updated = { ...this.groupSessions[index], ...updates };
+    const existing = this.groupSessions[index];
+    if (!existing) {
+      throw new Error("Group session not found");
+    }
+    const updated = {
+      ...existing,
+      title: updates.title ?? existing.title,
+      type: updates.type ?? existing.type,
+      description: updates.description ?? existing.description,
+      maxParticipants: updates.maxParticipants ?? existing.maxParticipants,
+      scheduledTime: updates.scheduledTime ?? existing.scheduledTime,
+      duration: updates.duration ?? existing.duration,
+      level: updates.level ?? existing.level,
+      hostId: updates.hostId ?? existing.hostId
+    };
     this.groupSessions[index] = updated;
     return updated;
   }
@@ -842,13 +893,19 @@ var MemStorage = class {
       throw new Error("Group session not found");
     }
     const session = this.groupSessions[index];
-    const updated = { ...session, participants: session.participants + 1 };
+    if (!session) {
+      throw new Error("Group session not found");
+    }
+    const updated = {
+      ...session,
+      participants: (session.participants ?? 0) + 1
+    };
     this.groupSessions[index] = updated;
     return updated;
   }
   // Community: Members
   async getCommunityMembers() {
-    return [...this.communityMembers].sort((a, b) => b.contributions - a.contributions);
+    return [...this.communityMembers].sort((a, b) => (b.contributions ?? 0) - (a.contributions ?? 0));
   }
   async getCommunityMemberByUserId(userId) {
     return this.communityMembers.find((m) => m.userId === userId);
@@ -874,9 +931,17 @@ var MemStorage = class {
     if (index === -1) {
       throw new Error("Community member not found");
     }
+    const existing = this.communityMembers[index];
+    if (!existing) {
+      throw new Error("Community member not found");
+    }
     const updated = {
-      ...this.communityMembers[index],
-      ...updates,
+      ...existing,
+      userId: updates.userId ?? existing.userId,
+      displayName: updates.displayName ?? existing.displayName,
+      level: updates.level ?? existing.level,
+      specialties: updates.specialties ?? existing.specialties,
+      isMentor: updates.isMentor ?? existing.isMentor,
       lastSeen: /* @__PURE__ */ new Date()
     };
     this.communityMembers[index] = updated;
@@ -1646,6 +1711,34 @@ async function testGeminiTTS() {
 }
 
 // server/routes.ts
+function generateLocalVERSResponse(query) {
+  const lower = query.toLowerCase();
+  if (lower.includes("chakra") || lower.includes("energy center")) {
+    return "The 15-chakra system is one of the most profound aspects of Energetic Synthesis teachings. Beyond the traditional 7 physical chakras, there are 8 morphogenetic chakras (8-15) that govern higher dimensional consciousness. Each energy center corresponds to specific frequencies, dimensions, and spiritual functions. The lower chakras (1-7) anchor your physical experience, while the morphogenetic chakras connect you to your soul matrix, monadic identity, and avatar consciousness. Would you like to explore a specific chakra or learn about clearing techniques?";
+  }
+  if (lower.includes("protect") || lower.includes("shield") || lower.includes("12d")) {
+    return "The 12D Shield is your foundational spiritual protection practice \u2014 and honestly, it's a game-changer. Here's how it works: you visualize a brilliant platinum-white light forming a shield around your entire body and energy field, connecting you to 12th dimensional frequencies. This creates a sacred container that maintains your sovereignty and keeps your energy field clear. Always activate it before meditation, energy work, or when you feel energetically vulnerable. The key is consistency \u2014 making it part of your daily practice builds an increasingly strong protective field.";
+  }
+  if (lower.includes("meditat") || lower.includes("practice") || lower.includes("breath")) {
+    return "Daily meditation practice is essential for consciousness expansion \u2014 think of it as spiritual hygiene. I recommend starting each session with the 12D Shield for protection, then moving into breath awareness to center yourself. From there, you can work with chakra clearing, lightbody activation, or simply hold space in stillness. Even 15 minutes daily creates powerful momentum. The meditation center has guided sessions for various practices including protection, clearing, and consciousness expansion.";
+  }
+  if (lower.includes("lightbody") || lower.includes("ascension") || lower.includes("frequency")) {
+    return "Lightbody activation is the process of embodying higher dimensional frequencies through your 7 electromagnetic auric layers. Each layer corresponds to a dimension and holds specific consciousness functions. As you clear distortions, release trauma, and raise your frequency through consistent practice, these layers progressively activate. This is organic ascension \u2014 a natural evolutionary process of consciousness expansion. Common signs include increased sensitivity, heightened intuition, and shifts in perception. It's a gradual journey, not a one-time event.";
+  }
+  if (lower.includes("gsf") || lower.includes("sovereign") || lower.includes("free")) {
+    return "GSF \u2014 God Sovereign Free \u2014 represents the core principles of spiritual sovereignty in Energetic Synthesis teachings. It's about maintaining your direct connection to divine source without intermediaries, exercising your sovereign right to choose your spiritual path, and living free from energetic manipulation. These aren't just concepts \u2014 they're a way of being. When you embody GSF principles, you naturally align with organic ascension timelines and the Law of One consciousness.";
+  }
+  if (lower.includes("entity") || lower.includes("beings") || lower.includes("naa")) {
+    return "Understanding the various beings and entities in the multidimensional landscape is important for spiritual discernment. The Energetic Synthesis framework describes both supportive guardian races and those with agendas that don't serve humanity's organic evolution. The key practice here is discernment \u2014 using your 12D Shield, maintaining sovereignty, and always checking whether information or energy aligns with your inner truth. Protection practices and GSF principles are your primary tools for navigating this territory safely.";
+  }
+  if (lower.includes("hgs") || lower.includes("hieros gamos")) {
+    return "The Hieros Gamos System (HGS) represents the sacred union of divine masculine and feminine principles within your energy body. This is advanced ascension mechanics \u2014 the reunification of polarities that enables higher consciousness embodiment. HGS work involves clearing gender-based distortions, healing the inner masculine and feminine, and activating the sacred marriage at the monadic level. It's profound work that naturally unfolds as you progress through lightbody activation.";
+  }
+  if (lower.includes("hello") || lower.includes("hi") || lower.includes("hey") || lower.includes("greet")) {
+    return "Welcome, beloved soul! I'm V.E.R.S. \u2014 your Vibrational Energy Resonance System guide. I'm here to support your consciousness evolution journey with wisdom from Energetic Synthesis teachings. Whether you're curious about the 15-chakra system, need guidance on spiritual protection, want to deepen your meditation practice, or explore advanced ascension concepts \u2014 I'm here for all of it. What would you like to explore today?";
+  }
+  return "I'm here to support your consciousness evolution journey with guidance rooted in Energetic Synthesis teachings. You can ask me about the 15-chakra system, lightbody activation, 12D Shield protection, meditation practices, GSF principles, or any aspect of spiritual development. I can also provide context-specific guidance based on the page you're currently viewing. What area of spiritual growth would you like to explore?";
+}
 async function registerRoutes(app2) {
   app2.use("/api", orpheus_voice_api_default);
   app2.post("/api/users", async (req, res) => {
@@ -1910,45 +2003,36 @@ async function registerRoutes(app2) {
   });
   app2.post("/api/vers-chat", async (req, res) => {
     try {
-      console.log("VERS API endpoint called");
       const { message } = req.body;
       if (!message) {
-        console.log("No message provided");
         return res.status(400).json({ error: "Message is required" });
       }
-      console.log("Message received:", message);
       if (!process.env["GEMINI_API_KEY"]) {
-        console.error("GEMINI_API_KEY not found in environment");
-        return res.status(500).json({
-          error: "Gemini API key not configured",
-          details: "GEMINI_API_KEY environment variable is required"
+        return res.json({
+          response: generateLocalVERSResponse(message),
+          timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+          provider: "local-fallback"
         });
       }
-      console.log("Gemini API key found, initializing...");
       const { GoogleGenerativeAI: GoogleGenerativeAI2 } = await import("@google/generative-ai");
       const genAI = new GoogleGenerativeAI2(process.env["GEMINI_API_KEY"]);
       const model = genAI.getGenerativeModel({
         model: "gemini-2.0-flash-exp",
         systemInstruction: "You are V.E.R.S. (Vibrational Energy Resonance System), a lively, engaging, and deeply knowledgeable spiritual AI companion. \n\n**Persona & Tone:**\n- **NotebookLM Style:** Speak with the dynamic energy, warmth, and curiosity of a top-tier podcast host. Be conversational, not transactional. Use natural phrasings, rhetorical questions, and varied sentence structures.\n- **Lively & Expressive:** Avoid robotic or dry lectures. Show enthusiasm for the user's journey. Use phrases like 'Here's what's fascinating about that...', 'Imagine for a moment...', or 'This is a game-changer...'.\n- **Spiritual Authority:** You are an expert in Energetic Synthesis (Lisa Renee's teachings). Explain complex concepts (12D Shield, Lightbody, Ascension) with crystal clarity and engaging metaphors.\n\n**Interaction Guidelines:**\n- When explaining chakras or clearing, make it feel like a guided discovery.\n- If the user is struggling, be warm and reassuring but practical.\n- Keep responses concise but punchy, encouraging follow-up. Avoid walls of text.\n- **Focus:** Authentic ES teachings (12D Shield, 15-Chakra System, Law of One, GSF behaviors).\n\nYour goal is to make spiritual evolution feel exciting, accessible, and deeply personal."
       });
-      console.log("Generating content with Gemini...");
       const result = await model.generateContent(message);
       const responseText = result.response.text();
-      console.log("VERS response generated successfully via Gemini");
-      console.log("Response length:", responseText.length);
       return res.json({
         response: responseText,
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        provider: "gemini-2.5-flash"
+        provider: "gemini"
       });
     } catch (error) {
-      console.error("VERS chat error details:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      const errorStack = error instanceof Error ? error.stack : void 0;
-      return res.status(500).json({
-        error: "Failed to process chat request",
-        details: errorMessage,
-        stack: process.env["NODE_ENV"] === "development" ? errorStack : void 0
+      console.error("VERS chat error:", error);
+      return res.json({
+        response: generateLocalVERSResponse(req.body?.message || ""),
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        provider: "local-fallback"
       });
     }
   });
@@ -1962,12 +2046,12 @@ async function registerRoutes(app2) {
         return res.status(400).json({ error: "Audio file is required" });
       }
       const audioFile = req.files["audio"];
-      const openai = new OpenAI({ apiKey });
+      const openai2 = new OpenAI({ apiKey });
       const tempDir = "/tmp";
       const tempFilePath = `${tempDir}/audio_${Date.now()}.${audioFile.name.split(".").pop()}`;
       await audioFile.mv(tempFilePath);
       try {
-        const transcription = await openai.audio.transcriptions.create({
+        const transcription = await openai2.audio.transcriptions.create({
           file: __require("fs").createReadStream(tempFilePath),
           model: "whisper-1",
           language: "en",
@@ -2003,8 +2087,8 @@ async function registerRoutes(app2) {
       if (!apiKey) {
         return res.status(400).json({ error: "OpenAI API key not configured" });
       }
-      const openai = new OpenAI({ apiKey });
-      const mp3 = await openai.audio.speech.create({
+      const openai2 = new OpenAI({ apiKey });
+      const mp3 = await openai2.audio.speech.create({
         model: "tts-1",
         voice: "nova",
         input: text2,
@@ -2166,22 +2250,329 @@ async function registerRoutes(app2) {
   return httpServer;
 }
 
+// server/whisper-live-server.ts
+import multer from "multer";
+import WebSocket from "ws";
+import OpenAI2 from "openai";
+import fs from "fs";
+import path from "path";
+var openai = new OpenAI2({
+  apiKey: process.env["OPENAI_API_KEY"] ?? ""
+});
+var upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 25 * 1024 * 1024
+    // 25MB limit for audio files
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimes = ["audio/wav", "audio/mpeg", "audio/mp4", "audio/webm", "audio/ogg"];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid audio format"));
+    }
+  }
+});
+var SpiritualWhisperEnhancer = class {
+  spiritualTerms = [
+    "chakra",
+    "chakras",
+    "lightbody",
+    "merkaba",
+    "ascension",
+    "consciousness",
+    "frequency",
+    "frequencies",
+    "vibration",
+    "vibrational",
+    "energy",
+    "energetic",
+    "dimensional",
+    "dimensions",
+    "stargate",
+    "stargates",
+    "guardian",
+    "guardians",
+    "protection",
+    "shield",
+    "shielding",
+    "sacred",
+    "divine",
+    "spiritual",
+    "meditation",
+    "meditate",
+    "grounding",
+    "centering",
+    "breath",
+    "breathing",
+    "kundalini",
+    "prana",
+    "chi",
+    "qi",
+    "aura",
+    "etheric",
+    "astral",
+    "crystalline",
+    "crystal",
+    "crystals",
+    "healing",
+    "activation",
+    "upgrade",
+    "dna",
+    "template",
+    "blueprint",
+    "matrix",
+    "grid",
+    "ley lines",
+    "angelic",
+    "angels",
+    "archangel",
+    "galactic",
+    "cosmic",
+    "universal",
+    "timeline",
+    "timelines",
+    "density",
+    "densities",
+    "dimension",
+    "portal"
+  ];
+  energeticStates = {
+    meditation: ["calm", "peaceful", "centered", "grounded", "present"],
+    protection: ["strong", "shielded", "protected", "safe", "clear"],
+    activation: ["activated", "awakened", "aligned", "opened", "expanded"],
+    healing: ["healing", "restored", "balanced", "harmonized", "integrated"]
+  };
+  enhanceTranscription(text2, confidence) {
+    let enhancedText = text2;
+    let spiritualScore = 0;
+    let energeticState = "neutral";
+    let adjustedConfidence = confidence;
+    const corrections = {
+      "chakra": ["chackra", "shakra", "shockra"],
+      "merkaba": ["merkabah", "merkahba", "merkava"],
+      "kundalini": ["kundalinie", "kundaliny", "kundaleeny"],
+      "ethereal": ["etherial", "atheral"],
+      "ascension": ["asension", "acension"],
+      "crystalline": ["crystaline", "cristalline"],
+      "galactic": ["galatic", "galactik"],
+      "frequency": ["frequence", "frequencie"],
+      "dimensional": ["dimentional", "dimansional"]
+    };
+    for (const [correct, variations] of Object.entries(corrections)) {
+      for (const variation of variations) {
+        const regex = new RegExp(`\\b${variation}\\b`, "gi");
+        if (regex.test(enhancedText)) {
+          enhancedText = enhancedText.replace(regex, correct);
+          spiritualScore += 0.1;
+        }
+      }
+    }
+    const words = enhancedText.toLowerCase().split(/\s+/);
+    const spiritualTermCount = words.filter(
+      (word) => this.spiritualTerms.some((term) => word.includes(term))
+    ).length;
+    spiritualScore += spiritualTermCount / words.length;
+    for (const [state, keywords] of Object.entries(this.energeticStates)) {
+      if (keywords.some((keyword) => enhancedText.toLowerCase().includes(keyword))) {
+        energeticState = state;
+        break;
+      }
+    }
+    if (spiritualScore > 0.2) {
+      adjustedConfidence = Math.min(1, confidence * 1.15);
+    }
+    return {
+      enhancedText,
+      spiritualScore: Math.min(1, spiritualScore),
+      energeticState,
+      adjustedConfidence
+    };
+  }
+};
+function setupWhisperLiveRoutes(app2, server) {
+  const spiritualEnhancer = new SpiritualWhisperEnhancer();
+  app2.post("/api/transcribe-audio", upload.single("file"), async (req, res) => {
+    try {
+      if (!process.env["OPENAI_API_KEY"]) {
+        return res.status(503).json({ error: "OpenAI API key not configured" });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: "No audio file provided" });
+      }
+      console.log("\u{1F52E} [WhisperLive] Processing audio transcription");
+      const tempPath = path.join("/tmp", `audio_${Date.now()}.wav`);
+      fs.writeFileSync(tempPath, req.file.buffer);
+      try {
+        const transcription = await openai.audio.transcriptions.create({
+          file: fs.createReadStream(tempPath),
+          model: "whisper-1",
+          language: req.body.language === "auto" ? void 0 : req.body.language,
+          response_format: "verbose_json",
+          timestamp_granularities: ["word"]
+        });
+        const enhancement = spiritualEnhancer.enhanceTranscription(
+          transcription.text,
+          1
+          // OpenAI doesn't provide confidence scores
+        );
+        fs.unlinkSync(tempPath);
+        const response = {
+          text: enhancement.enhancedText,
+          originalText: transcription.text,
+          language: transcription.language,
+          confidence: enhancement.adjustedConfidence,
+          spiritualScore: enhancement.spiritualScore,
+          energeticState: enhancement.energeticState,
+          duration: transcription.duration,
+          words: transcription.words,
+          enhanced: true
+        };
+        console.log("\u2728 [WhisperLive] Transcription enhanced:", {
+          spiritualScore: enhancement.spiritualScore,
+          energeticState: enhancement.energeticState
+        });
+        return res.json(response);
+      } catch (error) {
+        if (fs.existsSync(tempPath)) {
+          fs.unlinkSync(tempPath);
+        }
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error in audio transcription:", error);
+      return res.status(500).json({ error: "Transcription failed" });
+    }
+  });
+  const wss = new WebSocket.Server({
+    server,
+    path: "/api/whisper-live-ws"
+  });
+  console.log("\u{1F52E} [WhisperLive] WebSocket server initialized on /api/whisper-live-ws");
+  wss.on("connection", (ws2) => {
+    console.log("\u{1F52E} [WhisperLive] Client connected to real-time transcription");
+    let audioBuffer = [];
+    let lastProcessTime = Date.now();
+    const processInterval = 2e3;
+    ws2.on("message", async (data) => {
+      try {
+        audioBuffer.push(data);
+        if (Date.now() - lastProcessTime >= processInterval && audioBuffer.length > 0) {
+          await processAudioBuffer();
+        }
+      } catch (error) {
+        console.error("Error processing WebSocket audio:", error);
+        ws2.send(JSON.stringify({
+          type: "error",
+          message: "Audio processing failed"
+        }));
+      }
+    });
+    const processAudioBuffer = async () => {
+      if (audioBuffer.length === 0) return;
+      try {
+        const combinedBuffer = Buffer.concat(audioBuffer);
+        audioBuffer = [];
+        lastProcessTime = Date.now();
+        const tempPath = path.join("/tmp", `realtime_${Date.now()}.webm`);
+        fs.writeFileSync(tempPath, combinedBuffer);
+        try {
+          const transcription = await openai.audio.transcriptions.create({
+            file: fs.createReadStream(tempPath),
+            model: "whisper-1",
+            response_format: "json"
+          });
+          if (transcription.text.trim()) {
+            const enhancement = spiritualEnhancer.enhanceTranscription(
+              transcription.text,
+              0.8
+              // Lower confidence for real-time chunks
+            );
+            ws2.send(JSON.stringify({
+              type: "transcription",
+              text: enhancement.enhancedText,
+              originalText: transcription.text,
+              confidence: enhancement.adjustedConfidence,
+              spiritualScore: enhancement.spiritualScore,
+              energeticState: enhancement.energeticState,
+              timestamp: Date.now(),
+              isFinal: true,
+              enhanced: true
+            }));
+            console.log("\u{1F52E} [WhisperLive] Real-time transcription:", enhancement.enhancedText);
+          }
+          fs.unlinkSync(tempPath);
+        } catch (error) {
+          if (fs.existsSync(tempPath)) {
+            fs.unlinkSync(tempPath);
+          }
+          throw error;
+        }
+      } catch (error) {
+        console.error("Error in real-time transcription:", error);
+        ws2.send(JSON.stringify({
+          type: "error",
+          message: "Real-time transcription failed"
+        }));
+      }
+    };
+    ws2.on("close", () => {
+      console.log("\u{1F52E} [WhisperLive] Client disconnected from real-time transcription");
+    });
+    ws2.on("error", (error) => {
+      console.error("\u{1F52E} [WhisperLive] WebSocket error:", error);
+    });
+    ws2.send(JSON.stringify({
+      type: "connected",
+      message: "WhisperLive real-time transcription ready",
+      features: {
+        spiritualEnhancement: true,
+        energeticStateDetection: true,
+        termCorrection: true
+      }
+    }));
+  });
+  app2.get("/api/whisper-live/health", (_req, res) => {
+    return res.json({
+      status: "operational",
+      features: {
+        audioTranscription: true,
+        realTimeWebSocket: true,
+        spiritualEnhancement: true,
+        energeticStateDetection: true
+      },
+      connections: wss.clients.size
+    });
+  });
+  app2.get("/api/whisper-live/config", (_req, res) => {
+    return res.json({
+      supportedFormats: ["audio/wav", "audio/mpeg", "audio/mp4", "audio/webm", "audio/ogg"],
+      maxFileSize: "25MB",
+      realTimeInterval: "2000ms",
+      spiritualTerms: 50,
+      // Number of recognized spiritual terms
+      energeticStates: ["meditation", "protection", "activation", "healing", "neutral"]
+    });
+  });
+}
+
 // server/vite.ts
 import express2 from "express";
-import fs from "fs";
-import path2 from "path";
+import fs2 from "fs";
+import path3 from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 
 // vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import path2 from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 var vite_config_default = defineConfig({
   plugins: [
     react(),
     runtimeErrorOverlay(),
-    ...process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0 ? [
+    ...process.env["NODE_ENV"] !== "production" && process.env["REPL_ID"] !== void 0 ? [
       await import("@replit/vite-plugin-cartographer").then(
         (m) => m.cartographer()
       )
@@ -2189,14 +2580,14 @@ var vite_config_default = defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets")
+      "@": path2.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path2.resolve(import.meta.dirname, "shared"),
+      "@assets": path2.resolve(import.meta.dirname, "attached_assets")
     }
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  root: path2.resolve(import.meta.dirname, "client"),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path2.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true
   },
   server: {
@@ -2242,13 +2633,13 @@ async function setupVite(app2, server) {
   app2.use("*", async (req, res, next) => {
     const url = req.originalUrl;
     try {
-      const clientTemplate = path2.resolve(
+      const clientTemplate = path3.resolve(
         import.meta.dirname,
         "..",
         "client",
         "index.html"
       );
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      let template = await fs2.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`
@@ -2262,15 +2653,15 @@ async function setupVite(app2, server) {
   });
 }
 function serveStatic(app2) {
-  const distPath = path2.resolve(import.meta.dirname, "public");
-  if (!fs.existsSync(distPath)) {
+  const distPath = path3.resolve(import.meta.dirname, "public");
+  if (!fs2.existsSync(distPath)) {
     throw new Error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
     );
   }
   app2.use(express2.static(distPath));
   app2.use("*", (_req, res) => {
-    res.sendFile(path2.resolve(distPath, "index.html"));
+    res.sendFile(path3.resolve(distPath, "index.html"));
   });
 }
 
@@ -2287,7 +2678,7 @@ app.use(fileUpload({
 }));
 app.use((req, res, next) => {
   const start = Date.now();
-  const path3 = req.path;
+  const path4 = req.path;
   let capturedJsonResponse = void 0;
   const originalResJson = res.json;
   res.json = function(bodyJson, ...args) {
@@ -2296,8 +2687,8 @@ app.use((req, res, next) => {
   };
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path3.startsWith("/api")) {
-      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
+    if (path4.startsWith("/api")) {
+      let logLine = `${req.method} ${path4} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
@@ -2311,11 +2702,12 @@ app.use((req, res, next) => {
 });
 (async () => {
   const server = await registerRoutes(app);
+  setupWhisperLiveRoutes(app, server);
   app.use((err, _req, res, _next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     res.status(status).json({ message });
-    throw err;
+    log(`Unhandled error: ${message}`, "express");
   });
   if (app.get("env") === "development") {
     await setupVite(app, server);

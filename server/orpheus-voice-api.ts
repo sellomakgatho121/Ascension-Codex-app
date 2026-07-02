@@ -19,17 +19,17 @@ interface OrpheusRequest {
 }
 
 // Health check endpoint
-orpheusVoiceRouter.get('/orpheus-health', async (req: Request, res: Response) => {
+orpheusVoiceRouter.get('/orpheus-health', async (_req: Request, res: Response) => {
   try {
     // Check if Orpheus-TTS is available
     // In production, this would check the actual Orpheus API
-    res.json({ 
+    return res.json({ 
       status: 'available', 
       engine: 'orpheus-tts',
       voices: ['tara', 'leah', 'jess', 'leo', 'dan', 'mia', 'zac', 'zoe']
     });
   } catch (error) {
-    res.status(503).json({ 
+    return res.status(503).json({ 
       status: 'unavailable', 
       error: 'Orpheus-TTS service not accessible',
       fallback: 'browser-synthesis'
@@ -59,7 +59,7 @@ orpheusVoiceRouter.post('/orpheus-synthesize', async (req: Request, res: Respons
     // In production, this would call the actual Orpheus API
     const synthesisResult = await simulateOrpheusSynthesis(enhancedPrompt, voice, speed);
 
-    res.json({
+    return res.json({
       audioUrl: synthesisResult.audioUrl,
       duration: synthesisResult.duration,
       text: text,
@@ -71,7 +71,7 @@ orpheusVoiceRouter.post('/orpheus-synthesize', async (req: Request, res: Respons
 
   } catch (error) {
     console.error('Orpheus synthesis error:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: 'Voice synthesis failed',
       fallback: true,
       message: 'Falling back to browser synthesis'
@@ -98,12 +98,14 @@ orpheusVoiceRouter.post('/orpheus-stream', async (req: Request, res: Response) =
     // Simulate streaming response
     // In production, this would stream from actual Orpheus API
     await simulateStreamingSynthesis(text, profile, res);
+    return;
 
   } catch (error) {
     console.error('Orpheus streaming error:', error);
     if (!res.headersSent) {
-      res.status(500).json({ error: 'Streaming synthesis failed' });
+      return res.status(500).json({ error: 'Streaming synthesis failed' });
     }
+    return;
   }
 });
 
@@ -136,7 +138,7 @@ orpheusVoiceRouter.post('/orpheus-test-voice', async (req: Request, res: Respons
     const voice = voiceMapping[profile as keyof typeof voiceMapping] || 'tara';
     const result = await simulateOrpheusSynthesis(`${voice}: ${testText}`, voice, 1.0);
 
-    res.json({
+    return res.json({
       ...result,
       testText,
       profile,
@@ -146,12 +148,12 @@ orpheusVoiceRouter.post('/orpheus-test-voice', async (req: Request, res: Respons
 
   } catch (error) {
     console.error('Voice test error:', error);
-    res.status(500).json({ error: 'Voice test failed' });
+    return res.status(500).json({ error: 'Voice test failed' });
   }
 });
 
 // Available voices endpoint
-orpheusVoiceRouter.get('/orpheus-voices', (req: Request, res: Response) => {
+orpheusVoiceRouter.get('/orpheus-voices', (_req: Request, res: Response) => {
   const voices = [
     {
       id: 'aurora-divine',
@@ -209,7 +211,7 @@ orpheusVoiceRouter.get('/orpheus-voices', (req: Request, res: Response) => {
     }
   ];
 
-  res.json({ voices });
+  return res.json({ voices });
 });
 
 // Helper functions
@@ -234,7 +236,7 @@ function addSpiritualEmotionTags(text: string, emotion?: string): string {
 
 async function simulateOrpheusSynthesis(
   prompt: string, 
-  voice: string, 
+  _voice: string, 
   speed: number = 1.0
 ): Promise<{ audioUrl: string; duration: number; quality: string }> {
   
@@ -257,7 +259,7 @@ async function simulateOrpheusSynthesis(
 
 async function simulateStreamingSynthesis(
   text: string, 
-  profile: string, 
+  _profile: string, 
   res: Response
 ): Promise<void> {
   

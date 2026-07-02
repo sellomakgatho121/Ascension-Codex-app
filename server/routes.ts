@@ -584,12 +584,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Signal completion
       res.write(`data: ${JSON.stringify({ type: 'done', totalChunks: chunkIndex })}\n\n`);
       res.end();
+      return;
 
     } catch (error: unknown) {
       console.error('[VERS TTS Stream] Error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       res.write(`data: ${JSON.stringify({ type: 'error', message: errorMessage })}\n\n`);
       res.end();
+      return;
     }
   });
 

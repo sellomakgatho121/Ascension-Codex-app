@@ -8,6 +8,27 @@ import {
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
+type ChakraProgressData = NonNullable<UserProgress["chakraProgress"]>;
+type LightbodyProgressData = NonNullable<UserProgress["lightbodyProgress"]>;
+type GridProgressData = NonNullable<UserProgress["gridProgress"]>;
+type SpiritualContentDetails = NonNullable<SpiritualContent["content"]>;
+
+const emptyChakraProgress = (): ChakraProgressData => ({
+  physicalChakras: [],
+  morphogeneticChakras: [],
+  completedChakras: [],
+});
+
+const emptyLightbodyProgress = (): LightbodyProgressData => ({
+  activatedLayers: [],
+  integrationLevel: 0,
+});
+
+const emptyGridProgress = (): GridProgressData => ({
+  activatedSpheres: [],
+  shieldIntegration: [],
+});
+
 export interface IStorage {
   // User management
   getUser(id: number): Promise<User | undefined>;
@@ -101,9 +122,9 @@ export class DatabaseStorage implements IStorage {
     } else {
       return await this.createUserProgress({
         userId,
-        chakraProgress: progressUpdate.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-        lightbodyProgress: progressUpdate.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-        gridProgress: progressUpdate.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+        chakraProgress: progressUpdate.chakraProgress || emptyChakraProgress(),
+        lightbodyProgress: progressUpdate.lightbodyProgress || emptyLightbodyProgress(),
+        gridProgress: progressUpdate.gridProgress || emptyGridProgress(),
         overallLevel: progressUpdate.overallLevel || 0
       });
     }
@@ -112,9 +133,9 @@ export class DatabaseStorage implements IStorage {
   async createUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
     const insertData: any = {
       userId: progress.userId,
-      chakraProgress: progress.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-      lightbodyProgress: progress.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-      gridProgress: progress.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+      chakraProgress: progress.chakraProgress || emptyChakraProgress(),
+      lightbodyProgress: progress.lightbodyProgress || emptyLightbodyProgress(),
+      gridProgress: progress.gridProgress || emptyGridProgress(),
       overallLevel: progress.overallLevel || 0
     };
     
@@ -214,9 +235,13 @@ export class DatabaseStorage implements IStorage {
     const [newPost] = await db
       .insert(forumPosts)
       .values({
-        ...post,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        title: post.title,
+        content: post.content,
+        category: post.category,
+        tags: post.tags || null,
+        authorId: post.authorId ?? 1,
+        likes: 0,
+        replies: 0,
       })
       .returning();
     if (!newPost) throw new Error('Failed to create forum post');
@@ -257,8 +282,16 @@ export class DatabaseStorage implements IStorage {
     const [newSession] = await db
       .insert(groupSessions)
       .values({
-        ...session,
-        createdAt: new Date(),
+        title: session.title,
+        type: session.type,
+        description: session.description,
+        maxParticipants: session.maxParticipants,
+        scheduledTime: session.scheduledTime,
+        duration: session.duration,
+        level: session.level,
+        hostId: session.hostId ?? 1,
+        participants: 0,
+        isActive: 1,
       })
       .returning();
     if (!newSession) throw new Error('Failed to create group session');
@@ -339,8 +372,10 @@ export class DatabaseStorage implements IStorage {
     const [newReaction] = await db
       .insert(postReactions)
       .values({
-        ...reaction,
-        createdAt: new Date(),
+        postId: reaction.postId,
+        type: reaction.type,
+        content: reaction.content || null,
+        userId: reaction.userId ?? 1,
       })
       .returning();
     if (!newReaction) throw new Error('Failed to create post reaction');
@@ -604,22 +639,25 @@ export class MemStorage implements IStorage {
     
     if (existingIndex >= 0) {
       const existing = this.userProgress[existingIndex];
+      if (!existing) {
+        throw new Error('User progress not found');
+      }
       const updated: UserProgress = {
         ...existing,
         lastUpdated: new Date(),
-        ...(progressUpdate.chakraProgress && { chakraProgress: progressUpdate.chakraProgress }),
-        ...(progressUpdate.lightbodyProgress && { lightbodyProgress: progressUpdate.lightbodyProgress }),
-        ...(progressUpdate.gridProgress && { gridProgress: progressUpdate.gridProgress }),
-        ...(progressUpdate.overallLevel !== undefined && { overallLevel: progressUpdate.overallLevel })
+        chakraProgress: (progressUpdate.chakraProgress as ChakraProgressData | null | undefined) ?? existing.chakraProgress,
+        lightbodyProgress: (progressUpdate.lightbodyProgress as LightbodyProgressData | null | undefined) ?? existing.lightbodyProgress,
+        gridProgress: (progressUpdate.gridProgress as GridProgressData | null | undefined) ?? existing.gridProgress,
+        overallLevel: progressUpdate.overallLevel ?? existing.overallLevel
       };
       this.userProgress[existingIndex] = updated;
       return updated;
     } else {
       return await this.createUserProgress({
         userId,
-        chakraProgress: progressUpdate.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-        lightbodyProgress: progressUpdate.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-        gridProgress: progressUpdate.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+        chakraProgress: progressUpdate.chakraProgress || emptyChakraProgress(),
+        lightbodyProgress: progressUpdate.lightbodyProgress || emptyLightbodyProgress(),
+        gridProgress: progressUpdate.gridProgress || emptyGridProgress(),
         overallLevel: progressUpdate.overallLevel || 0
       });
     }
@@ -629,9 +667,9 @@ export class MemStorage implements IStorage {
     const newProgress: UserProgress = {
       id: this.nextId.userProgress++,
       userId: progress.userId,
-      chakraProgress: progress.chakraProgress || { physicalChakras: [], morphogeneticChakras: [], completedChakras: [] },
-      lightbodyProgress: progress.lightbodyProgress || { activatedLayers: [], integrationLevel: 0 },
-      gridProgress: progress.gridProgress || { activatedSpheres: [], shieldIntegration: [] },
+      chakraProgress: (progress.chakraProgress ?? emptyChakraProgress()) as ChakraProgressData,
+      lightbodyProgress: (progress.lightbodyProgress ?? emptyLightbodyProgress()) as LightbodyProgressData,
+      gridProgress: (progress.gridProgress ?? emptyGridProgress()) as GridProgressData,
       overallLevel: progress.overallLevel || 0,
       lastUpdated: new Date()
     };
@@ -665,7 +703,7 @@ export class MemStorage implements IStorage {
       category: content.category,
       title: content.title,
       description: content.description,
-      content: content.content || null,
+      content: (content.content as SpiritualContentDetails | null | undefined) || null,
       order: content.order || 0
     };
     this.spiritualContent.push(newContent);
@@ -735,10 +773,17 @@ export class MemStorage implements IStorage {
     if (index === -1) {
       throw new Error('Forum post not found');
     }
+    const existing = this.forumPosts[index];
+    if (!existing) {
+      throw new Error('Forum post not found');
+    }
     
-    const updated = {
-      ...this.forumPosts[index],
-      ...updates,
+    const updated: ForumPost = {
+      ...existing,
+      title: updates.title ?? existing.title,
+      content: updates.content ?? existing.content,
+      category: updates.category ?? existing.category,
+      tags: updates.tags ?? existing.tags,
       updatedAt: new Date()
     };
     this.forumPosts[index] = updated;
@@ -791,8 +836,22 @@ export class MemStorage implements IStorage {
     if (index === -1) {
       throw new Error('Group session not found');
     }
+    const existing = this.groupSessions[index];
+    if (!existing) {
+      throw new Error('Group session not found');
+    }
     
-    const updated = { ...this.groupSessions[index], ...updates };
+    const updated: GroupSession = {
+      ...existing,
+      title: updates.title ?? existing.title,
+      type: updates.type ?? existing.type,
+      description: updates.description ?? existing.description,
+      maxParticipants: updates.maxParticipants ?? existing.maxParticipants,
+      scheduledTime: updates.scheduledTime ?? existing.scheduledTime,
+      duration: updates.duration ?? existing.duration,
+      level: updates.level ?? existing.level,
+      hostId: updates.hostId ?? existing.hostId,
+    };
     this.groupSessions[index] = updated;
     return updated;
   }
@@ -804,14 +863,20 @@ export class MemStorage implements IStorage {
     }
     
     const session = this.groupSessions[index];
-    const updated = { ...session, participants: session.participants + 1 };
+    if (!session) {
+      throw new Error('Group session not found');
+    }
+    const updated: GroupSession = {
+      ...session,
+      participants: (session.participants ?? 0) + 1,
+    };
     this.groupSessions[index] = updated;
     return updated;
   }
 
   // Community: Members
   async getCommunityMembers(): Promise<CommunityMember[]> {
-    return [...this.communityMembers].sort((a, b) => b.contributions - a.contributions);
+    return [...this.communityMembers].sort((a, b) => (b.contributions ?? 0) - (a.contributions ?? 0));
   }
 
   async getCommunityMemberByUserId(userId: number): Promise<CommunityMember | undefined> {
@@ -840,10 +905,18 @@ export class MemStorage implements IStorage {
     if (index === -1) {
       throw new Error('Community member not found');
     }
+    const existing = this.communityMembers[index];
+    if (!existing) {
+      throw new Error('Community member not found');
+    }
     
-    const updated = {
-      ...this.communityMembers[index],
-      ...updates,
+    const updated: CommunityMember = {
+      ...existing,
+      userId: updates.userId ?? existing.userId,
+      displayName: updates.displayName ?? existing.displayName,
+      level: updates.level ?? existing.level,
+      specialties: updates.specialties ?? existing.specialties,
+      isMentor: updates.isMentor ?? existing.isMentor,
       lastSeen: new Date()
     };
     this.communityMembers[index] = updated;

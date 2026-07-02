@@ -1,7 +1,7 @@
 // WhisperLiveKit Server Integration for VERS Assistant
 // Real-time speech-to-text with spiritual context enhancement
 
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import multer from 'multer';
 import WebSocket from 'ws';
 import { Server } from 'http';
@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env['OPENAI_API_KEY'] ?? ''
 });
 
 // Multer configuration for audio uploads
@@ -19,7 +19,7 @@ const upload = multer({
   limits: {
     fileSize: 25 * 1024 * 1024 // 25MB limit for audio files
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req, file, cb) => {
     const allowedMimes = ['audio/wav', 'audio/mpeg', 'audio/mp4', 'audio/webm', 'audio/ogg'];
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
@@ -127,8 +127,12 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
   const spiritualEnhancer = new SpiritualWhisperEnhancer();
 
   // Audio transcription endpoint
-  app.post('/api/transcribe-audio', upload.single('file'), async (req, res) => {
+  app.post('/api/transcribe-audio', upload.single('file'), async (req: Request, res: Response) => {
     try {
+      if (!process.env['OPENAI_API_KEY']) {
+        return res.status(503).json({ error: 'OpenAI API key not configured' });
+      }
+
       if (!req.file) {
         return res.status(400).json({ error: 'No audio file provided' });
       }
@@ -175,7 +179,7 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
           energeticState: enhancement.energeticState
         });
 
-        res.json(response);
+        return res.json(response);
       } catch (error) {
         // Clean up temp file on error
         if (fs.existsSync(tempPath)) {
@@ -185,7 +189,7 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
       }
     } catch (error) {
       console.error('Error in audio transcription:', error);
-      res.status(500).json({ error: 'Transcription failed' });
+      return res.status(500).json({ error: 'Transcription failed' });
     }
   });
 
@@ -304,8 +308,8 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
   });
 
   // Health check endpoint
-  app.get('/api/whisper-live/health', (req, res) => {
-    res.json({
+  app.get('/api/whisper-live/health', (_req, res) => {
+    return res.json({
       status: 'operational',
       features: {
         audioTranscription: true,
@@ -318,8 +322,8 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
   });
 
   // Configuration endpoint
-  app.get('/api/whisper-live/config', (req, res) => {
-    res.json({
+  app.get('/api/whisper-live/config', (_req, res) => {
+    return res.json({
       supportedFormats: ['audio/wav', 'audio/mpeg', 'audio/mp4', 'audio/webm', 'audio/ogg'],
       maxFileSize: '25MB',
       realTimeInterval: '2000ms',

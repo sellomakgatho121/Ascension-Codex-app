@@ -7,7 +7,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 //   - do not change this unless explicitly requested by the user
 
 // This API key is from Gemini Developer API Key, not vertex AI API Key
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(process.env['GEMINI_API_KEY'] || "");
 
 export async function summarizeArticle(text: string): Promise<string> {
     try {
@@ -133,8 +133,6 @@ export async function generateImage(
     imagePath: string,
 ): Promise<void> {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-        
         // Note: Image generation is not available in the current API
         // This is a placeholder for future implementation
         console.log(`Image generation requested for: ${prompt}`);
