@@ -68,21 +68,21 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // On Vercel, static assets are served by the CDN (configured in vercel.json).
-  // The function should only handle API and SSR routes, so skip static serving here.
+  // On Vercel, ./dist/public is at the root of the lambda filesystem
+  // (built by npm run build, uploaded by Vercel)
+  let distPath: string;
   if (process.env.VERCEL) {
-    log("Running on Vercel — static assets served via CDN");
+    distPath = path.resolve(process.cwd(), "dist", "public");
+  } else {
+    distPath = path.resolve(import.meta.dirname, "public");
+  }
+
+  if (!fs.existsSync(distPath)) {
+    log(`WARNING: Could not find the build directory: ${distPath}. Static file serving disabled.`);
     return;
   }
 
-  const distPath = path.resolve(import.meta.dirname, "public");
-
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
-  }
-
+  log(`Serving static files from ${distPath}`);
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
