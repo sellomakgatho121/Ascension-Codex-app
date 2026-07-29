@@ -2,7 +2,7 @@ import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import fileUpload from 'express-fileupload';
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic, mountSpaFallback, log } from "./vite";
 import os from "os";
 
 const app = express();
@@ -57,7 +57,16 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    try {
+      serveStatic(app);
+    } catch (err: any) {
+      log(`WARNING: serveStatic failed (${err.message}), mounting SPA fallback directly`);
+      try {
+        mountSpaFallback(app);
+      } catch (err2: any) {
+        log(`CRITICAL: SPA fallback also failed: ${err2.message}`);
+      }
+    }
   }
 
   // Only bind to a port outside of Vercel (local dev / Docker / etc.)
