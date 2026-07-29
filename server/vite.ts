@@ -68,6 +68,13 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
+  // On Vercel, static assets are served by the CDN (configured in vercel.json).
+  // The function should only handle API and SSR routes, so skip static serving here.
+  if (process.env.VERCEL) {
+    log("Running on Vercel — static assets served via CDN");
+    return;
+  }
+
   const distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {

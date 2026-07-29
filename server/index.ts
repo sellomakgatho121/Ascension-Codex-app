@@ -60,7 +60,8 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  if (process.env.NODE_ENV !== "production") {
+  // Only bind to a port outside of Vercel (local dev / Docker / etc.)
+  if (!process.env.VERCEL) {
     const port = 5000;
     server.listen({
       port,
