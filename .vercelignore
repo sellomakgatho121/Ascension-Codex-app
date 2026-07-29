@@ -2,7 +2,7 @@ node_modules
 android
 build
 output
-dist/public
+dist/index.js
 .capacitor
 *.apk
 *.keystore
