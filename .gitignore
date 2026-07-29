@@ -3,3 +3,34 @@ node_modules
 server/public
 vite.config.ts.*
 *.tar.gz
+.vercel
+
+# Build artifacts
+dist/
+build/
+output/
+*.apk
+*.keystore
+*.aab
+
+# Environment
+.env
+.env.local
+.env.production
+.env.development
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Capacitor
+android/.gradle/
+android/build/
+android/local.properties
+.capacitor/
+
+# Logs
+*.log
+npm-debug.log*

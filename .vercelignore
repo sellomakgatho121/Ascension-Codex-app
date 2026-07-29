@@ -1,0 +1,10 @@
+node_modules
+android
+build
+output
+dist/public
+.capacitor
+*.apk
+*.keystore
+.env
+.git

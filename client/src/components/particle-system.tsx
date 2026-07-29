@@ -1,98 +1,126 @@
-import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+
+interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  size: number;
+  color: string;
+  opacity: number;
+}
+
+const COLORS = ['#8b5cf6', '#3b82f6', '#ffd700', '#ffffff'];
+const MAX_PARTICLES = 60; // down from 100 — imperceptible difference
 
 export function ParticleSystem() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const rafRef = useRef<number>(0);
+  const runningRef = useRef(true);
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-        let animationFrameId: number;
-        let particles: Particle[] = [];
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
 
-        class Particle {
-            x: number;
-            y: number;
-            size: number;
-            speedX: number;
-            speedY: number;
-            color: string;
-            opacity: number;
+    // Init particles
+    particlesRef.current = Array.from({ length: MAX_PARTICLES }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      size: Math.random() * 1.5 + 0.5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      opacity: Math.random() * 0.5 + 0.2,
+    }));
 
-            constructor() {
-                this.x = Math.random() * canvas!.width;
-                this.y = Math.random() * canvas!.height;
-                this.size = Math.random() * 1.5 + 0.5;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.speedY = Math.random() * 0.5 - 0.25;
-
-                const colors = ['#8b5cf6', '#3b82f6', '#ffd700', '#ffffff'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.opacity = Math.random() * 0.5 + 0.2;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x > canvas!.width) this.x = 0;
-                else if (this.x < 0) this.x = canvas!.width;
-                if (this.y > canvas!.height) this.y = 0;
-                else if (this.y < 0) this.y = canvas!.height;
-            }
-
-            draw() {
-                if (!ctx) return;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.opacity;
-                ctx.fill();
-            }
+    // Track visibility
+    const onVisibility = () => {
+      runningRef.current = !document.hidden;
+      if (document.hidden) {
+        // Tab hidden — cancel RAF and bail
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
         }
+      } else {
+        // Tab visible — resume
+        rafRef.current = requestAnimationFrame(frame);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
-        const init = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for (let i = 0; i < 100; i++) {
-                particles.push(new Particle());
-            }
-        };
+    // Track viewport visibility via IntersectionObserver
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting && rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      } else if (entry.isIntersecting && !rafRef.current && runningRef.current) {
+        rafRef.current = requestAnimationFrame(frame);
+      }
+    }, { threshold: 0 });
+    observer.observe(canvas);
 
-        const animate = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            animationFrameId = requestAnimationFrame(animate);
-        };
+    // Animation loop
+    let lastTime = performance.now();
+    // Cap to 30fps to reduce battery drain
+    const frameInterval = 1000 / 30;
 
-        init();
-        animate();
+    function frame(now: number) {
+      const elapsed = now - lastTime;
+      if (elapsed < frameInterval) {
+        rafRef.current = requestAnimationFrame(frame);
+        return;
+      }
+      lastTime = now - (elapsed % frameInterval);
 
-        const handleResize = () => {
-            init();
-        };
+      if (!canvas || !ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        window.addEventListener('resize', handleResize);
+      const particles = particlesRef.current;
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
 
-        return () => {
-            cancelAnimationFrame(animationFrameId);
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+        if (p.x > canvas.width) p.x = 0;
+        else if (p.x < 0) p.x = canvas.width;
+        if (p.y > canvas.height) p.y = 0;
+        else if (p.y < 0) p.y = canvas.height;
 
-    return (
-        <canvas
-            ref={canvasRef}
-            className="absolute inset-0 pointer-events-none z-0"
-            style={{ opacity: 0.6 }}
-        />
-    );
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+        ctx.fill();
+      }
+
+      rafRef.current = requestAnimationFrame(frame);
+    }
+
+    rafRef.current = requestAnimationFrame(frame);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', onVisibility);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0 gpu-layer"
+      style={{ willChange: 'transform' }}
+    />
+  );
 }

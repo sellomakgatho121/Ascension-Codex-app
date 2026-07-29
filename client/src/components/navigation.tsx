@@ -12,9 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { MobileNavigation } from "./mobile-navigation";
-import { antiSprings, antiGlitchFlash } from "@/lib/anti-animation-system";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -94,18 +92,9 @@ export function Navigation() {
     <header className="bg-anti-void/90 backdrop-blur-sm border-b border-anti-acid/20 sticky top-0 z-50 font-anti-mono">
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={antiSprings.snap}
-          >
+          <div className="transition-opacity duration-300">
             <Link href="/">
-              <motion.a
-                className="flex items-center space-x-3 group cursor-pointer min-w-0 magnetic-hover"
-                whileHover="hover"
-                variants={antiGlitchFlash}
-                animate={glitchActive ? "glitch" : "idle"}
-              >
+              <a className="flex items-center space-x-3 group cursor-pointer min-w-0 magnetic-hover">
                 <div className="relative">
                   <div className="w-10 h-10 border border-anti-acid bg-anti-void flex items-center justify-center relative overflow-hidden">
                     <span className="text-anti-acid font-anti-display text-2xl leading-none tracking-tighter">AC</span>
@@ -121,9 +110,9 @@ export function Navigation() {
                     {time} // ACTIVE
                   </span>
                 </div>
-              </motion.a>
+              </a>
             </Link>
-          </motion.div>
+          </div>
 
           <div className="hidden lg:flex items-center justify-center flex-1 px-4">
             <NavigationMenu>
@@ -142,20 +131,19 @@ export function Navigation() {
                           <span className="text-[10px] text-anti-acid/50 font-anti-mono tracking-widest">{group.coord} {group.title}</span>
                           <span className="text-[10px] text-anti-acid/30 font-anti-mono">{group.items.length} ENTRIES</span>
                         </div>
-                        <AnimatePresence>
+                        <div className="animate-dropdown-fade-in">
                           {group.items.map((item, idx) => (
-                            <motion.div
+                            <div
                               key={item.title}
-                              initial={{ opacity: 0, x: -8 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: idx * 0.03 }}
+                              className="transition-all duration-150"
+                              style={{ animationDelay: `${idx * 30}ms` }}
                             >
                               <ListItem title={item.title} href={item.href} index={idx}>
                                 {item.description}
                               </ListItem>
-                            </motion.div>
+                            </div>
                           ))}
-                        </AnimatePresence>
+                        </div>
                       </ul>
                     </NavigationMenuContent>
                   </NavigationMenuItem>
@@ -165,14 +153,9 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={antiSprings.snap}
-              className="hidden xl:block w-56"
-            >
+          <div className="hidden xl:block w-56 transition-opacity duration-300">
               <GlobalSearch />
-            </motion.div>
+            </div>
 
             <div className="hidden md:block xl:hidden">
               <Button variant="ghost" size="icon" className="text-anti-acid hover:text-anti-neon hover:bg-anti-acid/5 rounded-none border border-transparent hover:border-anti-acid/30 transition-all">

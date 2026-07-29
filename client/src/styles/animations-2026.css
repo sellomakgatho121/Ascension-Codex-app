@@ -1,0 +1,376 @@
+/* ═══════════════════════════════════════════════════════════════════════
+ * ASCENSION CODEX — 2026 ANIMATION SYSTEM
+ * GPU-composited, browser-native animations.
+ * Zero framer-motion dependency for all scroll/entry/exit animations.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── @property: Typed CSS Custom Properties ────────────────────────
+ * Enables CSS-native transitions for custom properties without JS.
+ * Browser support: Chrome 120+, Firefox 128+, Safari 18.2+              */
+
+@property --scroll-progress {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: true;
+}
+
+@property --mouse-x {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+@property --mouse-y {
+  syntax: "<length>";
+  initial-value: 0px;
+  inherits: false;
+}
+
+@property --glow-intensity {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: true;
+}
+
+@property --rotate-y {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --rotate-x {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ─── @starting-style: Native entry animations ─────────────────────
+ * Elements get entry animations on first render without JS.
+ * Replaces framer-motion AnimatePresence initial/animate.
+ * Browser support: Chrome 120+, Firefox 129+, Safari 18.2+             */
+
+@starting-style {
+  .with-entry {
+    opacity: 0;
+    translate: 0 20px;
+  }
+  .with-entry-left {
+    opacity: 0;
+    translate: -20px 0;
+  }
+  .with-entry-scale {
+    opacity: 0;
+    scale: 0.9;
+  }
+}
+
+/* ─── View Transitions API ─────────────────────────────────────────
+ * Smooth cross-page morphing animations.
+ * Called via document.startViewTransition() on navigation.            */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-fade-out 0.3s ease-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 0.4s ease-out 0.1s forwards;
+}
+
+@keyframes vt-fade-out {
+  to { opacity: 0; translate: 0 -10px; }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; translate: 0 20px; }
+  to { opacity: 1; translate: 0; }
+}
+
+/* ─── Scroll-Driven Animation Classes ──────────────────────────────
+ * Uses CSS animation-timeline (scroll/view) — no JS needed.
+ * Replaces framer-motion useScroll() + useTransform().
+ * Browser support: Chrome 120+, Firefox 130+, Safari 18.2+             */
+
+/* Parallax depth — hero section skews as you scroll */
+@keyframes depth-parallax {
+  0%   { transform: perspective(1200px) rotateX(1deg) translateY(0); }
+  50%  { transform: perspective(1200px) rotateX(0deg) translateY(-1%); }
+  100% { transform: perspective(1200px) rotateX(-0.5deg) translateY(-2%); }
+}
+
+.depth-parallax {
+  animation: depth-parallax linear forwards;
+  animation-timeline: scroll(root);
+  animation-range: 0vh 100vh;
+  perspective: 1200px;
+}
+
+/* Depth layers — multi-plane parallax with 3D perspective */
+.depth-layer-1 { transform: translateZ(0); }
+.depth-layer-2 { transform: translateZ(50px) scale(0.95); }
+.depth-layer-3 { transform: translateZ(100px) scale(0.9); }
+
+/* Scroll reveal — fade+slide in on view enter */
+@keyframes scroll-reveal {
+  from {
+    opacity: 0;
+    translate: 0 30px;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+    filter: blur(0);
+  }
+}
+
+.scroll-reveal {
+  animation: scroll-reveal linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 80%;
+}
+
+/* Stagger reveal for lists/grids — each child delays slightly */
+@keyframes stagger-child-in {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+    scale: 1;
+  }
+}
+
+.stagger-container {
+  view-timeline-name: --stagger-tl;
+}
+
+.stagger-child {
+  animation: stagger-child-in linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 80%;
+}
+
+/* Each child delays via its own --stagger-index */
+.stagger-child:nth-child(1) { animation-range: entry 0% entry 50%; }
+.stagger-child:nth-child(2) { animation-range: entry 5% entry 55%; }
+.stagger-child:nth-child(3) { animation-range: entry 10% entry 60%; }
+.stagger-child:nth-child(4) { animation-range: entry 15% entry 65%; }
+.stagger-child:nth-child(5) { animation-range: entry 20% entry 70%; }
+.stagger-child:nth-child(6) { animation-range: entry 25% entry 75%; }
+.stagger-child:nth-child(7) { animation-range: entry 30% entry 80%; }
+.stagger-child:nth-child(8) { animation-range: entry 35% entry 85%; }
+
+/* Glow reveal — element glows green on view enter */
+@keyframes glow-reveal {
+  from {
+    opacity: 0;
+    box-shadow: 0 0 0px rgba(57, 255, 20, 0);
+  }
+  to {
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(57, 255, 20, 0.1);
+  }
+}
+
+.glow-reveal {
+  animation: glow-reveal linear forwards;
+  animation-timeline: view();
+  animation-range: entry 0% entry 70%;
+}
+
+/* Scroll progress indicator */
+@keyframes scroll-indicator-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.scroll-indicator-fill {
+  animation: scroll-indicator-fill linear forwards;
+  animation-timeline: scroll(root);
+}
+
+/* ─── 3D Card Tilt on Hover (CSS-only, no JS) ────────────────────── */
+
+.card-3d-perspective {
+  perspective: 800px;
+}
+
+.card-3d {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform:
+    rotateX(calc(var(--mouse-y, 0) * -0.5deg))
+    rotateY(calc(var(--mouse-x, 0) * 0.5deg))
+    translateZ(20px);
+}
+
+.card-3d-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.card-3d:hover .card-3d-glow {
+  box-shadow: 0 0 40px rgba(57, 255, 20, 0.15);
+}
+
+/* ─── Tab/Content Entry Animations ──────────────────────────────────
+ * Replaces framer-motion <AnimatePresence> + <motion.div> patterns.   */
+
+@keyframes tab-enter {
+  from { opacity: 0; translate: 0 15px; }
+  to { opacity: 1; translate: 0; }
+}
+
+@keyframes tab-exit {
+  from { opacity: 1; translate: 0; }
+  to { opacity: 0; translate: 0 -15px; }
+}
+
+.tab-enter {
+  animation: tab-enter 0.3s ease-out;
+}
+
+/* Exit animation via the old content being removed */
+.tab-exit {
+  animation: tab-exit 0.2s ease-in;
+}
+
+/* ─── High-Intensity Interactive Effects ──────────────────────────── */
+
+/* Energy pulse ring — ripples outward on hover */
+@keyframes energy-ring {
+  0%   { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+.energy-ring {
+  position: relative;
+}
+
+.energy-ring::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: inherit;
+  animation: energy-ring 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Resonance wave — music visualizer style bars on content sections */
+@keyframes resonance-wave {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.5); }
+}
+
+.resonance-bar {
+  animation: resonance-wave 2s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+/* ─── Scroll Glitch (periodic, CSS-only) ──────────────────────────── */
+
+@keyframes scroll-glitch-tear {
+  0%, 95%, 100% { clip-path: inset(0); }
+  96%  { clip-path: inset(20% 0 60% 0); }
+  97%  { clip-path: inset(40% 0 30% 0); }
+  98%  { clip-path: inset(10% 0 70% 0); }
+}
+
+.scroll-glitch {
+  animation: scroll-glitch-tear 8s linear infinite;
+}
+
+/* ─── Entry Animation Atomic Classes ──────────────────────────────── */
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s ease-out forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; translate: 0 20px; }
+  to { opacity: 1; translate: 0; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; scale: 0.9; }
+  to { opacity: 1; scale: 1; }
+}
+
+/* ─── High-Intensity Ambient Animations ───────────────────────────── */
+
+/* 3D floating sacred geometry */
+@keyframes float-3d {
+  0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+  25%  { transform: translateY(-10px) rotateX(2deg) rotateY(3deg); }
+  50%  { transform: translateY(-5px) rotateX(-1deg) rotateY(-2deg); }
+  75%  { transform: translateY(-8px) rotateX(3deg) rotateY(1deg); }
+}
+
+.float-3d {
+  animation: float-3d 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+/* Pulsing glow */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(57, 255, 20, 0.1), 0 0 10px rgba(57, 255, 20, 0.05); }
+  50%      { box-shadow: 0 0 15px rgba(57, 255, 20, 0.3), 0 0 30px rgba(57, 255, 20, 0.1); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ─── Audio-visual Feedback Classes ──────────────────────────────────
+ * Applied via JS when interaction sounds play.                        */
+
+.interact-flash {
+  animation: interact-flash 0.3s ease-out;
+}
+
+@keyframes interact-flash {
+  0%   { box-shadow: 0 0 0px rgba(57, 255, 20, 0); }
+  50%  { box-shadow: 0 0 20px rgba(57, 255, 20, 0.4), 0 0 40px rgba(57, 255, 20, 0.2); }
+  100% { box-shadow: 0 0 0px rgba(57, 255, 20, 0); }
+}
+
+/* ─── Mobile: Reduce motion ───────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .depth-parallax {
+    animation: none;
+  }
+  .scroll-reveal,
+  .stagger-child {
+    animation: none;
+    opacity: 1;
+    filter: none;
+  }
+}

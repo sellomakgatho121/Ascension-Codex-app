@@ -847,3 +847,142 @@
 .anti-tilt:hover {
   transform: rotateX(2deg) rotateY(-3deg) scale(1.01);
 }
+
+/* GPU-accelerated layer — promotes element to its own compositor layer */
+.gpu-layer {
+  will-change: transform;
+}
+
+/* ═══ GPU-COMPOSITED AMBIENT ANIMATIONS ══════════════════════════════
+ * All run on the compositor thread — zero main-thread cost.
+ * Replaces framer-motion driven ambient effects.                      */
+
+/* Scan bar — moves top-to-bottom continuously */
+@keyframes scan-bar {
+  0%   { top: -2px; opacity: 0; }
+  5%   { opacity: 0.4; }
+  90%  { opacity: 0.4; }
+  95%  { opacity: 0; }
+  100% { top: 100%; }
+}
+.animate-scan-bar {
+  animation: scan-bar 8s ease-in-out infinite;
+  will-change: top;
+}
+
+/* Glitch lines — random fade in/out */
+@keyframes glitch-line {
+  0%, 85%, 100% { opacity: 0; transform: translateX(-20px) scaleX(0.8); }
+  10%  { opacity: 0.6; transform: translateX(0) scaleX(1); }
+  25%  { opacity: 0.3; transform: translateX(5px) scaleX(0.95); }
+  40%  { opacity: 0.5; transform: translateX(-3px) scaleX(1); }
+  60%  { opacity: 0.2; transform: translateX(8px) scaleX(0.9); }
+  75%  { opacity: 0.4; transform: translateX(-2px) scaleX(1); }
+}
+.animate-glitch-line {
+  animation: glitch-line 5s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Ambient pulse — slow breathing gradient */
+@keyframes ambient-pulse-a {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(1.15); }
+}
+.animate-ambient-pulse-a {
+  animation: ambient-pulse-a 6s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes ambient-pulse-b {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%      { opacity: 0.7; transform: scale(1.1); }
+}
+.animate-ambient-pulse-b {
+  animation: ambient-pulse-b 8s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Subtle grid rotation */
+@keyframes grid-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-grid-rotate {
+  animation: grid-rotate 120s linear infinite;
+  will-change: transform;
+}
+
+/* ═══ SACRED GEOMETRY ROTATIONS (CSS-only) ══════════════════════════ */
+
+@keyframes geom-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes geom-rotate-reverse {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes geom-rotate-slow {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+/* ═══ PAGE TRANSITIONS (GPU-composited) ═════════════════════════════ */
+
+@keyframes page-fade-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.page-transition-enter {
+  animation: page-fade-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes dropdown-fade-in {
+  0%   { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-dropdown-fade-in > div {
+  animation: dropdown-fade-in 0.2s ease-out forwards;
+  opacity: 0;
+  animation-fill-mode: backwards;
+}
+
+/* ═══ TEXT REVEAL (replaces framer-motion per-character animations) ════ */
+
+@keyframes text-reveal-in {
+  0%   { opacity: 0; filter: blur(4px); transform: translateY(20px); }
+  100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+.animate-text-reveal {
+  animation: text-reveal-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: opacity, filter, transform;
+}
+
+/* ═══ GLITCH BLOCK (replaces framer-motion antiGlitchFlash variants) ═══ */
+
+@keyframes glitch-block-flash {
+  0%, 94%, 100% { opacity: 1; }
+  95%  { opacity: 0.7; filter: blur(1px) hue-rotate(90deg); }
+  96%  { opacity: 0.85; filter: blur(0.5px) hue-rotate(-45deg); }
+  97%  { opacity: 0.75; filter: blur(2px) brightness(1.3); }
+  98%  { opacity: 0.9; filter: blur(0); }
+}
+.animate-glitch-block {
+  animation: glitch-block-flash 6s ease-in-out infinite;
+  will-change: opacity, filter;
+}
+
+/* ═══ SOFT PULSE ═════════════════════════════════════════════════════ */
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 1; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}

@@ -1,4 +1,5 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { lazy, Suspense, useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,58 +12,82 @@ import { OnboardingSystem } from "@/components/onboarding-system";
 import { AccessibilityProvider } from "@/components/accessibility-provider";
 import { AscensionFooter } from "@/components/ascension-footer";
 import { SpiritualProgressProvider } from "@/lib/spiritual-progress-context";
-import { AnimatePresence } from "framer-motion";
 import { PageTransitionWrapper } from "@/components/page-transition-wrapper";
 import { AmbientBackground } from "@/components/ambient-background";
 import { AntiCursor } from "@/components/anti-design/custom-cursor";
 import { AntiScrollIndicator } from "@/components/anti-design/scroll-indicator";
-import { VERSProvider } from "@/lib/vers-context";
+import { VERSProvider, useVERS } from "@/lib/vers-context";
 import { VERSFloatingWidget } from "@/components/vers-floating-widget";
 
-// Pages
-import HomePage from "@/pages/home";
-import ChakraDevelopmentPage from "@/pages/chakra-development";
-import ChakrasPage from "@/pages/chakras";
-import LightbodyPage from "@/pages/lightbody";
-import HovaBodiesPage from "@/pages/hova-bodies";
-import TreeGridPage from "@/pages/tree-grid";
-import MeditationPage from "@/pages/meditation";
-import ProgressPage from "@/pages/progress";
-import GlossaryPage from "@/pages/glossary";
-import SoulCodexPage from "@/pages/soul-codex";
-import CommunityPage from "@/pages/community";
-import ToolsPage from "@/pages/tools";
-import KnowledgeBasePage from "@/pages/knowledge-base";
-import ChakraDetailPage from "@/pages/chakra-detail";
-import LightbodyDetailPage from "@/pages/lightbody-detail";
-import ConceptBrowserPage from "@/pages/concept-browser";
-import GSFPage from "@/pages/gsf";
-import ConceptDetailPage from "@/pages/concept-detail";
-import HGSPage from "@/pages/hgs";
-import HumanityCreationPage from "@/pages/humanity-creation";
-import TimelineWarsPage from "@/pages/timeline-wars";
-import UniversalTimeMatrixPage from "@/pages/universal-time-matrix";
-import Visualizations3DPage from "@/pages/3d-visualizations";
-import PsychicSelfDefensePage from "@/pages/psychic-self-defense";
-import BeingsEntitiesPage from "@/pages/beings-entities";
-import HigherSelfEvolutionPage from "@/pages/higher-self-evolution";
-import BlogTimelineShiftPage from "@/pages/blog-timeline-shift";
-import NAAToolsWeaponsPage from "./pages/naa-tools-weapons";
-import NotFound from "@/pages/not-found";
-import VERSAssistantPage from './pages/vers-assistant';
-import EnhancedVERSPage from './pages/enhanced-vers';
-import AdvancedConversationalAIPage from './pages/advanced-conversational-ai';
-import VERSWhisperLivePage from './pages/vers-whisper-live';
-import CreativeVisualsPage from './pages/creative-visuals';
-import VisualDiagrams from "./pages/visual-diagrams";
-import AdvancedVisualizationsPage from './pages/advanced-visualizations';
-import TypeScriptDemoPage from './pages/typescript-demo';
-import SacredGeometryPage from './pages/sacred-geometry';
-import DnaActivationPage from './pages/dna-activation';
-import DnaVisualizationPage from './pages/dna-visualization';
-import DimensionalAccessPage from './pages/dimensional-access';
-import AscensionMechanicsPage from './pages/ascension-mechanics';
-import EnhancedToolsPage from './pages/enhanced-tools';
+// Lazy-loaded pages — only loaded when their route is first visited
+const HomePage = lazy(() => import("@/pages/home"));
+const ChakraDevelopmentPage = lazy(() => import("@/pages/chakra-development"));
+const ChakrasPage = lazy(() => import("@/pages/chakras"));
+const LightbodyPage = lazy(() => import("@/pages/lightbody"));
+const HovaBodiesPage = lazy(() => import("@/pages/hova-bodies"));
+const TreeGridPage = lazy(() => import("@/pages/tree-grid"));
+const MeditationPage = lazy(() => import("@/pages/meditation"));
+const ProgressPage = lazy(() => import("@/pages/progress"));
+const GlossaryPage = lazy(() => import("@/pages/glossary"));
+const SoulCodexPage = lazy(() => import("@/pages/soul-codex"));
+const CommunityPage = lazy(() => import("@/pages/community"));
+const ToolsPage = lazy(() => import("@/pages/tools"));
+const EnhancedToolsPage = lazy(() => import("@/pages/enhanced-tools"));
+const KnowledgeBasePage = lazy(() => import("@/pages/knowledge-base"));
+const ChakraDetailPage = lazy(() => import("@/pages/chakra-detail"));
+const LightbodyDetailPage = lazy(() => import("@/pages/lightbody-detail"));
+const ConceptBrowserPage = lazy(() => import("@/pages/concept-browser"));
+const GSFPage = lazy(() => import("@/pages/gsf"));
+const ConceptDetailPage = lazy(() => import("@/pages/concept-detail"));
+const HGSPage = lazy(() => import("@/pages/hgs"));
+const HumanityCreationPage = lazy(() => import("@/pages/humanity-creation"));
+const TimelineWarsPage = lazy(() => import("@/pages/timeline-wars"));
+const UniversalTimeMatrixPage = lazy(() => import("@/pages/universal-time-matrix"));
+const Visualizations3DPage = lazy(() => import("@/pages/3d-visualizations"));
+const PsychicSelfDefensePage = lazy(() => import("@/pages/psychic-self-defense"));
+const BeingsEntitiesPage = lazy(() => import("@/pages/beings-entities"));
+const HigherSelfEvolutionPage = lazy(() => import("@/pages/higher-self-evolution"));
+const BlogTimelineShiftPage = lazy(() => import("@/pages/blog-timeline-shift"));
+const NAAToolsWeaponsPage = lazy(() => import("@/pages/naa-tools-weapons"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const AdvancedConversationalAIPage = lazy(() => import("@/pages/advanced-conversational-ai"));
+const EnhancedVERSPage = lazy(() => import("@/pages/enhanced-vers"));
+const VERSWhisperLivePage = lazy(() => import("@/pages/vers-whisper-live"));
+const CreativeVisualsPage = lazy(() => import("@/pages/creative-visuals"));
+const VisualDiagrams = lazy(() => import("@/pages/visual-diagrams"));
+const AdvancedVisualizationsPage = lazy(() => import("@/pages/advanced-visualizations"));
+const TypeScriptDemoPage = lazy(() => import("@/pages/typescript-demo"));
+const SacredGeometryPage = lazy(() => import("@/pages/sacred-geometry"));
+const DnaActivationPage = lazy(() => import("@/pages/dna-activation"));
+const DnaVisualizationPage = lazy(() => import("@/pages/dna-visualization"));
+const DimensionalAccessPage = lazy(() => import("@/pages/dimensional-access"));
+const AscensionMechanicsPage = lazy(() => import("@/pages/ascension-mechanics"));
+
+// Loading fallback shown while a page chunk loads
+function PageFallback() {
+  return (
+    <div className="min-h-screen bg-anti-bg flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-anti-acid/30 border-t-anti-acid rounded-full animate-spin" />
+    </div>
+  );
+}
+
+// Route consolidation: /assistant is now a redirect wrapper
+function VERSAssistantRedirect() {
+  const [, setLocation] = useLocation();
+  const { openChat } = useVERS();
+
+  useEffect(() => {
+    openChat();
+    setLocation("/");
+  }, [openChat, setLocation]);
+
+  return null;
+}
+
+function LazyRoute({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageFallback />}>{children}</Suspense>;
+}
 
 function Router() {
   return (
@@ -82,231 +107,320 @@ function Router() {
       </div>
 
       <BreadcrumbNav />
-      <AnimatePresence mode="wait">
-        <Switch key={location.toString()}>
+      <Switch>
           <Route path="/">
-            <PageTransitionWrapper variant="portal">
-              <HomePage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <HomePage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/chakra-development">
-            <PageTransitionWrapper>
-              <ChakraDevelopmentPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ChakraDevelopmentPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/chakras">
-            <PageTransitionWrapper variant="dimensional">
-              <ChakrasPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <ChakrasPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/lightbody">
-            <PageTransitionWrapper variant="portal">
-              <LightbodyPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <LightbodyPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/hova-bodies">
-            <PageTransitionWrapper>
-              <HovaBodiesPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <HovaBodiesPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/tree-grid">
-            <PageTransitionWrapper variant="dimensional">
-              <TreeGridPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <TreeGridPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/meditation">
-            <PageTransitionWrapper variant="portal">
-              <MeditationPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <MeditationPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/progress">
-            <PageTransitionWrapper>
-              <ProgressPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ProgressPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/glossary">
-            <PageTransitionWrapper>
-              <GlossaryPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <GlossaryPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/soul-codex">
-            <PageTransitionWrapper variant="portal">
-              <SoulCodexPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <SoulCodexPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/community">
-            <PageTransitionWrapper>
-              <CommunityPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <CommunityPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/tools">
-            <PageTransitionWrapper variant="portal">
-              <ToolsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <ToolsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/enhanced-tools">
-            <PageTransitionWrapper variant="portal">
-              <EnhancedToolsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <EnhancedToolsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/knowledge-base">
-            <PageTransitionWrapper>
-              <KnowledgeBasePage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <KnowledgeBasePage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/concept/:id">
-            <PageTransitionWrapper>
-              <ConceptDetailPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ConceptDetailPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/chakra-detail">
-            <PageTransitionWrapper>
-              <ChakraDetailPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ChakraDetailPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/lightbody-detail">
-            <PageTransitionWrapper>
-              <LightbodyDetailPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <LightbodyDetailPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/concept-browser">
-            <PageTransitionWrapper>
-              <ConceptBrowserPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ConceptBrowserPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/gsf">
-            <PageTransitionWrapper variant="portal">
-              <GSFPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <GSFPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/concept-detail/:id">
-            <PageTransitionWrapper>
-              <ConceptDetailPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <ConceptDetailPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/hgs">
-            <PageTransitionWrapper>
-              <HGSPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <HGSPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/humanity-creation">
-            <PageTransitionWrapper variant="portal">
-              <HumanityCreationPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <HumanityCreationPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/timeline-wars">
-            <PageTransitionWrapper>
-              <TimelineWarsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <TimelineWarsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/universal-time-matrix">
-            <PageTransitionWrapper variant="dimensional">
-              <UniversalTimeMatrixPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <UniversalTimeMatrixPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/3d-visualizations">
-            <PageTransitionWrapper variant="portal">
-              <Visualizations3DPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <Visualizations3DPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/psychic-self-defense">
-            <PageTransitionWrapper variant="portal">
-              <PsychicSelfDefensePage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <PsychicSelfDefensePage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/beings-entities">
-            <PageTransitionWrapper>
-              <BeingsEntitiesPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <BeingsEntitiesPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/higher-self-evolution">
-            <PageTransitionWrapper>
-              <HigherSelfEvolutionPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <HigherSelfEvolutionPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/blog-timeline-shift">
-            <PageTransitionWrapper>
-              <BlogTimelineShiftPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <BlogTimelineShiftPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/naa-tools-weapons">
-            <PageTransitionWrapper>
-              <NAAToolsWeaponsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <NAAToolsWeaponsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
+          {/* Consolidated VERS routes: /vers is canonical, others redirect */}
           <Route path="/vers">
-            <PageTransitionWrapper variant="portal">
-              <AdvancedConversationalAIPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <AdvancedConversationalAIPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/assistant">
-            <PageTransitionWrapper>
-              <VERSAssistantPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <VERSAssistantRedirect />
+            </LazyRoute>
           </Route>
           <Route path="/enhanced-vers">
-            <PageTransitionWrapper variant="portal">
-              <EnhancedVERSPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <EnhancedVERSPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/advanced-ai">
-            <PageTransitionWrapper>
-              <AdvancedConversationalAIPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <AdvancedConversationalAIPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/vers-whisper-live">
-            <PageTransitionWrapper>
-              <VERSWhisperLivePage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <VERSWhisperLivePage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/creative-visuals">
-            <PageTransitionWrapper variant="dimensional">
-              <CreativeVisualsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <CreativeVisualsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/visual-diagrams">
-            <PageTransitionWrapper variant="portal">
-              <VisualDiagrams />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <VisualDiagrams />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/advanced-visualizations">
-            <PageTransitionWrapper variant="dimensional">
-              <AdvancedVisualizationsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <AdvancedVisualizationsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/typescript-demo">
-            <PageTransitionWrapper>
-              <TypeScriptDemoPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <TypeScriptDemoPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/sacred-geometry">
-            <PageTransitionWrapper variant="dimensional">
-              <SacredGeometryPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <SacredGeometryPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/dna-activation">
-            <PageTransitionWrapper variant="portal">
-              <DnaActivationPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="portal">
+                <DnaActivationPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/dna-visualization">
-            <PageTransitionWrapper variant="dimensional">
-              <DnaVisualizationPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper variant="dimensional">
+                <DnaVisualizationPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/dimensional-access">
-            <PageTransitionWrapper>
-              <DimensionalAccessPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <DimensionalAccessPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
           <Route path="/ascension-mechanics">
-            <PageTransitionWrapper>
-              <AscensionMechanicsPage />
-            </PageTransitionWrapper>
+            <LazyRoute>
+              <PageTransitionWrapper>
+                <AscensionMechanicsPage />
+              </PageTransitionWrapper>
+            </LazyRoute>
           </Route>
-          <Route component={NotFound} />
+          <Route>
+            <LazyRoute>
+              <NotFound />
+            </LazyRoute>
+          </Route>
         </Switch>
-      </AnimatePresence>
       <FloatingMeditationButton />
 
       {/* Mobile bottom padding to account for bottom navigation */}

@@ -5,8 +5,15 @@ import {
   type GroupSession, type InsertGroupSession, type CommunityMember, type InsertCommunityMember,
   type PostReaction, type InsertPostReaction
 } from "@shared/schema";
-import { db } from "./db";
+import { getDb } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
+
+/** Lazy database accessor — resolves to null and falls back to MemStorage on Vercel serverless */
+function db() {
+  const instance = getDb();
+  if (!instance) throw new Error("Database not available — falling back to MemStorage");
+  return instance;
+}
 
 export interface IStorage {
   // User management
@@ -56,12 +63,12 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await db().select().from(users).where(eq(users.id, id));
     return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
+    const [user] = await db().select().from(users).where(eq(users.email, email));
     return user;
   }
 
@@ -75,7 +82,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserProgress(userId: number): Promise<UserProgress | undefined> {
-    const [progress] = await db.select().from(userProgress).where(eq(userProgress.userId, userId));
+    const [progress] = await db().select().from(userProgress).where(eq(userProgress.userId, userId));
     return progress;
   }
 
@@ -128,25 +135,25 @@ export class DatabaseStorage implements IStorage {
 
   async getSpiritualContent(type?: string, category?: string): Promise<SpiritualContent[]> {
     if (type && category) {
-      const content = await db.select().from(spiritualContent)
+      const content = await db().select().from(spiritualContent)
         .where(and(eq(spiritualContent.type, type), eq(spiritualContent.category, category)));
       return content.sort((a: SpiritualContent, b: SpiritualContent) => (a.order || 0) - (b.order || 0));
     } else if (type) {
-      const content = await db.select().from(spiritualContent)
+      const content = await db().select().from(spiritualContent)
         .where(eq(spiritualContent.type, type));
       return content.sort((a: SpiritualContent, b: SpiritualContent) => (a.order || 0) - (b.order || 0));
     } else if (category) {
-      const content = await db.select().from(spiritualContent)
+      const content = await db().select().from(spiritualContent)
         .where(eq(spiritualContent.category, category));
       return content.sort((a: SpiritualContent, b: SpiritualContent) => (a.order || 0) - (b.order || 0));
     }
     
-    const content = await db.select().from(spiritualContent);
+    const content = await db().select().from(spiritualContent);
     return content.sort((a: SpiritualContent, b: SpiritualContent) => (a.order || 0) - (b.order || 0));
   }
 
   async getSpiritualContentById(id: number): Promise<SpiritualContent | undefined> {
-    const [content] = await db.select().from(spiritualContent).where(eq(spiritualContent.id, id));
+    const [content] = await db().select().from(spiritualContent).where(eq(spiritualContent.id, id));
     return content;
   }
 
@@ -198,15 +205,15 @@ export class DatabaseStorage implements IStorage {
   // Community: Forum posts
   async getForumPosts(category?: string): Promise<ForumPost[]> {
     const query = category 
-      ? db.select().from(forumPosts).where(eq(forumPosts.category, category))
-      : db.select().from(forumPosts);
+      ? db().select().from(forumPosts).where(eq(forumPosts.category, category))
+      : db().select().from(forumPosts);
     
     const posts = await query.orderBy(desc(forumPosts.createdAt));
     return posts;
   }
 
   async getForumPostById(id: number): Promise<ForumPost | undefined> {
-    const [post] = await db.select().from(forumPosts).where(eq(forumPosts.id, id));
+    const [post] = await db().select().from(forumPosts).where(eq(forumPosts.id, id));
     return post;
   }
 
@@ -234,7 +241,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteForumPost(id: number): Promise<boolean> {
-    const result = await db.delete(forumPosts).where(eq(forumPosts.id, id));
+    const result = await db().delete(forumPosts).where(eq(forumPosts.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 
@@ -249,7 +256,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getGroupSessionById(id: number): Promise<GroupSession | undefined> {
-    const [session] = await db.select().from(groupSessions).where(eq(groupSessions.id, id));
+    const [session] = await db().select().from(groupSessions).where(eq(groupSessions.id, id));
     return session;
   }
 
@@ -348,7 +355,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePostReaction(id: number): Promise<boolean> {
-    const result = await db.delete(postReactions).where(eq(postReactions.id, id));
+    const result = await db().delete(postReactions).where(eq(postReactions.id, id));
     return (result.rowCount ?? 0) > 0;
   }
 }

@@ -51,23 +51,13 @@ export class SpiritualWhisperEnhancer {
     'timeline', 'timelines', 'density', 'densities', 'dimension', 'portal'
   ];
 
-  private energeticStates = {
-    meditation: ['calm', 'peaceful', 'centered', 'grounded', 'present'],
-    protection: ['strong', 'shielded', 'protected', 'safe', 'clear'],
-    activation: ['activated', 'awakened', 'aligned', 'opened', 'expanded'],
-    healing: ['healing', 'restored', 'balanced', 'harmonized', 'integrated']
-  };
-
   enhanceTranscription(text: string, confidence: number): {
     enhancedText: string;
     spiritualScore: number;
-    energeticState: string;
     adjustedConfidence: number;
   } {
     let enhancedText = text;
     let spiritualScore = 0;
-    let energeticState = 'neutral';
-    let adjustedConfidence = confidence;
 
     // Convert common mispronunciations of spiritual terms
     const corrections = {
@@ -95,30 +85,16 @@ export class SpiritualWhisperEnhancer {
 
     // Calculate spiritual term frequency
     const words = enhancedText.toLowerCase().split(/\s+/);
-    const spiritualTermCount = words.filter(word => 
+    const spiritualTermCount = words.filter(word =>
       this.spiritualTerms.some(term => word.includes(term))
     ).length;
-    
-    spiritualScore += spiritualTermCount / words.length;
 
-    // Detect energetic state
-    for (const [state, keywords] of Object.entries(this.energeticStates)) {
-      if (keywords.some(keyword => enhancedText.toLowerCase().includes(keyword))) {
-        energeticState = state;
-        break;
-      }
-    }
-
-    // Adjust confidence based on spiritual content
-    if (spiritualScore > 0.2) {
-      adjustedConfidence = Math.min(1.0, confidence * 1.15); // Boost confidence for spiritual content
-    }
+    spiritualScore += spiritualTermCount / Math.max(words.length, 1);
 
     return {
       enhancedText,
       spiritualScore: Math.min(1.0, spiritualScore),
-      energeticState,
-      adjustedConfidence
+      adjustedConfidence: confidence // Use actual confidence, no boosting
     };
   }
 }
@@ -164,7 +140,6 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
           language: transcription.language,
           confidence: enhancement.adjustedConfidence,
           spiritualScore: enhancement.spiritualScore,
-          energeticState: enhancement.energeticState,
           duration: transcription.duration,
           words: transcription.words,
           enhanced: true
@@ -172,7 +147,7 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
 
         console.log('✨ [WhisperLive] Transcription enhanced:', {
           spiritualScore: enhancement.spiritualScore,
-          energeticState: enhancement.energeticState
+          adjustedConfidence: enhancement.adjustedConfidence
         });
 
         res.json(response);
@@ -257,7 +232,6 @@ export function setupWhisperLiveRoutes(app: express.Application, server: Server)
               originalText: transcription.text,
               confidence: enhancement.adjustedConfidence,
               spiritualScore: enhancement.spiritualScore,
-              energeticState: enhancement.energeticState,
               timestamp: Date.now(),
               isFinal: true,
               enhanced: true

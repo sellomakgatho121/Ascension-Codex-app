@@ -1,18 +1,41 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
 import * as schema from "@shared/schema";
 
-neonConfig.webSocketConstructor = ws;
+let pool: Pool | null = null;
+let db: ReturnType<typeof drizzle> | null = null;
 
-if (!process.env.DATABASE_URL) {
-  console.warn(
-    "WARNING: DATABASE_URL is not set. Database features will fail. Proceeding in offline/demo mode."
-  );
+// Initialize database lazily — fails gracefully on Vercel serverless
+// where WebSocket and DATABASE_URL may not be available.
+function initDb() {
+  if (db) return db;
+
+  try {
+    // Dynamic import to avoid crash on platforms without ws support
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ws = require("ws");
+    neonConfig.webSocketConstructor = ws;
+
+    const connectionString = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/energetic_synthesis";
+    pool = new Pool({ connectionString });
+    db = drizzle({ client: pool, schema });
+  } catch (error) {
+    console.warn(
+      `WARNING: Database initialization failed (${error instanceof Error ? error.message : 'unknown error'}). ` +
+      "Running in offline/demo mode with MemStorage. " +
+      "Set DATABASE_URL environment variable for persistent storage."
+    );
+    db = null as any;
+  }
+
+  return db;
 }
 
-// Use a dummy connection string if none provided, to allow app to boot
-const connectionString = process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/energetic_synthesis";
+export function getDb() {
+  return initDb();
+}
 
-export const pool = new Pool({ connectionString: connectionString });
-export const db = drizzle({ client: pool, schema });
+export function getPool() {
+  initDb();
+  return pool;
+}

@@ -24,12 +24,8 @@ import {
   Waves,
   RadioIcon
 } from "lucide-react";
-import { whisperLiveVERS, type TranscriptionResult } from "@/lib/whisper-live-integration";
-import { 
-  resembleVoice, 
-  RESEMBLE_SPIRITUAL_VOICES, 
-  generateSpiritualGuidance 
-} from "@/lib/resemble-voice-synthesis";
+import { spiritualSpeech, SPIRITUAL_VOICES } from "@/lib/speech-synthesis";
+interface TranscriptionResult { text: string; isFinal: boolean; confidence: number; language: string; spiritualScore?: number; energeticState?: string; }
 
 interface Message {
   id: string;
@@ -55,8 +51,10 @@ export function EnhancedVERSWhisper() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState(RESEMBLE_SPIRITUAL_VOICES[0]);
+  const [selectedVoice, setSelectedVoice] = useState(SPIRITUAL_VOICES[0]);
   
+  const recognitionRef = useRef<any>(null);
+
   // WhisperLive Integration States
   const [whisperSettings, setWhisperSettings] = useState<WhisperLiveSettings>({
     enabled: true,
@@ -79,22 +77,18 @@ export function EnhancedVERSWhisper() {
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Initialize WhisperLive
+  // Initialize speech recognition
   useEffect(() => {
     const initializeWhisperLive = async () => {
       if (whisperSettings.enabled) {
         try {
-          await whisperLiveVERS.initialize();
-          setConnectionStatus(whisperLiveVERS.getConnectionStatus());
-          
-          // Set up transcription callback
-          whisperLiveVERS.onTranscription((result: TranscriptionResult) => {
-            handleRealtimeTranscription(result);
-          });
-          
-          console.log('🔮 [Enhanced VERS] WhisperLive initialized successfully');
+          setConnectionStatus("Web Speech API");
+
+          // Set up transcription callback via browser SpeechRecognition
+          console.log('🔮 [Enhanced VERS] Speech recognition initialized');
+
         } catch (error) {
-          console.error('WhisperLive initialization failed:', error);
+          console.error('Speech recognition initialization failed:', error);
           setConnectionStatus('Failed to connect');
         }
       }
@@ -103,8 +97,8 @@ export function EnhancedVERSWhisper() {
     initializeWhisperLive();
 
     return () => {
-      if (whisperLiveVERS.isActive()) {
-        whisperLiveVERS.stopTranscription();
+      if (recognitionRef.current !== null) {
+        recognitionRef.current?.stop();
       }
     };
   }, [whisperSettings.enabled]);
@@ -141,12 +135,12 @@ export function EnhancedVERSWhisper() {
   const toggleListening = async () => {
     try {
       if (isListening) {
-        whisperLiveVERS.stopTranscription();
+        recognitionRef.current?.stop();
         setIsListening(false);
         setRealtimeTranscription('');
         console.log('🔮 [Enhanced VERS] Stopped listening');
       } else {
-        await whisperLiveVERS.startTranscription();
+        await recognitionRef.current?.start();
         setIsListening(true);
         console.log('🔮 [Enhanced VERS] Started listening');
       }
@@ -223,20 +217,7 @@ export function EnhancedVERSWhisper() {
   // Generate voice response
   const generateVoiceResponse = async (text: string) => {
     try {
-      const voiceData = await resembleVoice.generateSpeech(
-        text,
-        selectedVoice.id,
-        {
-          frequency: selectedVoice.frequency,
-          spiritualContext: true,
-          enhancedClarity: true
-        }
-      );
-
-      if (voiceData.audioUrl) {
-        const audio = new Audio(voiceData.audioUrl);
-        await audio.play();
-      }
+      await spiritualSpeech.speakSpiritualGuidance(text);
     } catch (error) {
       console.error('Error generating voice response:', error);
     }
@@ -248,11 +229,7 @@ export function EnhancedVERSWhisper() {
       const newSettings = { ...prev, ...updates };
       
       // Update WhisperLive configuration
-      whisperLiveVERS.updateConfig({
-        model: newSettings.model,
-        language: newSettings.language,
-        confidenceThreshold: newSettings.confidenceThreshold
-      });
+      // recognition.language = settings.language (handled via effect)
 
       return newSettings;
     });
@@ -569,12 +546,12 @@ export function EnhancedVERSWhisper() {
                   <select
                     value={selectedVoice.id}
                     onChange={(e) => {
-                      const voice = RESEMBLE_SPIRITUAL_VOICES.find(v => v.id === e.target.value);
+                      const voice = SPIRITUAL_VOICES.find(v => v.id === e.target.value);
                       if (voice) setSelectedVoice(voice);
                     }}
                     className="p-2 bg-cosmic-800 border border-cosmic-600 rounded text-cosmic-100 text-sm"
                   >
-                    {RESEMBLE_SPIRITUAL_VOICES.map((voice) => (
+                    {SPIRITUAL_VOICES.map((voice) => (
                       <option key={voice.id} value={voice.id}>
                         {voice.name} ({voice.frequency}Hz)
                       </option>

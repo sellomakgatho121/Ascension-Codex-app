@@ -22,7 +22,7 @@ import {
   SacredGeometryGenerator,
   creativeEngine 
 } from "@/lib/creative-coding-engine";
-import { speakSpiritualGuidance } from "@/lib/vers-resemble-integration";
+import { spiritualSpeech } from "@/lib/speech-synthesis";
 import { SpiritualLogger, performanceMonitor } from "@/lib/typescript-enhancements";
 
 // Advanced Spiritual Visualization Component
@@ -157,9 +157,8 @@ export function AdvancedSpiritualVisualizations() {
         }
         
         if (audioEnabled) {
-          await speakSpiritualGuidance(
-            "Witness the activation of your seven sacred chakras. Feel the energy rising from your root to your crown, opening pathways of light and consciousness.",
-            { voiceProfile: 'aurora_divine', energyType: 'nurturing' }
+          await spiritualSpeech.speakSpiritualGuidance(
+            "Witness the activation of your seven sacred chakras. Feel the energy rising from your root to your crown, opening pathways of light and consciousness."
           );
         }
         break;
@@ -168,9 +167,8 @@ export function AdvancedSpiritualVisualizations() {
         particleSystemRef.current.createDNAParticles(centerX, centerY - 100, 200);
         
         if (audioEnabled) {
-          await speakSpiritualGuidance(
-            "Your divine DNA template is activating. The crystalline strands of light are reconnecting to your galactic heritage and cosmic consciousness.",
-            { voiceProfile: 'ember_wisdom', energyType: 'mystical' }
+          await spiritualSpeech.speakSpiritualGuidance(
+            "Your divine DNA template is activating. The crystalline strands of light are reconnecting to your galactic heritage and cosmic consciousness."
           );
         }
         break;
@@ -179,9 +177,8 @@ export function AdvancedSpiritualVisualizations() {
         particleSystemRef.current.createMerkabaParticles(centerX, centerY);
         
         if (audioEnabled) {
-          await speakSpiritualGuidance(
-            "Your merkaba light vehicle is spinning into activation. Feel the sacred geometry of divine protection surrounding your energy field.",
-            { voiceProfile: 'orion_guardian', energyType: 'protective' }
+          await spiritualSpeech.speakSpiritualGuidance(
+            "Your merkaba light vehicle is spinning into activation. Feel the sacred geometry of divine protection surrounding your energy field."
           );
         }
         break;

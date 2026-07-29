@@ -23,7 +23,7 @@ import {
   Volume2,
   VolumeX
 } from "lucide-react";
-import { orpheusVoice, getRecommendedVoiceForContent, type SpiritualVoiceProfile } from "@/lib/orpheus-voice-integration";
+import { spiritualSpeech, SPIRITUAL_VOICES, type VoiceProfile } from "@/lib/speech-synthesis";
 
 interface Message {
   id: string;
@@ -37,7 +37,7 @@ interface VoiceSettings {
   enabled: boolean;
   language: string;
   autoSend: boolean;
-  voiceProfile: SpiritualVoiceProfile;
+  voiceProfile: string;
   voiceEnabled: boolean;
 }
 
@@ -62,106 +62,122 @@ export function VERSWhisperSimple() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
-  // Initialize Orpheus voice engine and load available voices
+  // Initialize voice profiles
   useEffect(() => {
-    const initializeVoices = async () => {
-      try {
-        await orpheusVoice.initialize();
-        const voices = orpheusVoice.getAvailableVoices();
-        setAvailableVoices(voices);
-        console.log('Orpheus voice system initialized with', voices.length, 'spiritual voice profiles');
-      } catch (error) {
-        console.warn('Orpheus voice initialization failed, using browser synthesis:', error);
-      }
-    };
-
-    initializeVoices();
+    setAvailableVoices(SPIRITUAL_VOICES);
   }, []);
 
   // Initialize speech recognition
   useEffect(() => {
-    if (voiceSettings.enabled && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = voiceSettings.language;
-
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
-
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-
-        if (finalTranscript) {
-          setInputText(finalTranscript.trim());
-          setRealtimeText('');
-          
-          if (voiceSettings.autoSend && finalTranscript.trim()) {
-            handleSendMessage(finalTranscript.trim(), 'voice');
-          }
-        } else {
-          setRealtimeText(interimTranscript);
-        }
-      };
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-        setRealtimeText('');
-      };
+    // Clean up previous instance
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch (_) { /* already stopped */ }
+      recognitionRef.current = null;
     }
+
+    if (!voiceSettings.enabled) return;
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = voiceSettings.language;
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      let interimTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        setInputText(finalTranscript.trim());
+        setRealtimeText('');
+
+        if (voiceSettings.autoSend && finalTranscript.trim()) {
+          handleSendMessage(finalTranscript.trim(), 'voice');
+        }
+      } else {
+        setRealtimeText(interimTranscript);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setRealtimeText('');
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      try { recognition.stop(); } catch (_) { /* already stopped */ }
+      if (recognitionRef.current === recognition) {
+        recognitionRef.current = null;
+      }
+    };
   }, [voiceSettings.enabled, voiceSettings.language, voiceSettings.autoSend]);
+
+  // Create a fresh recognition instance (handles terminal-state issue)
+  const createRecognition = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return null;
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = voiceSettings.language;
+    recognition.onresult = recognitionRef.current?.onresult || null;
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      setRealtimeText('');
+    };
+    return recognition;
+  };
 
   // Toggle listening
   const toggleListening = () => {
-    if (!recognitionRef.current) return;
-
     if (isListening) {
-      recognitionRef.current.stop();
+      recognitionRef.current?.stop();
       setIsListening(false);
     } else {
-      recognitionRef.current.start();
-      setIsListening(true);
+      // Create fresh instance to avoid terminal-state InvalidStateError
+      const fresh = createRecognition();
+      if (fresh) {
+        recognitionRef.current = fresh;
+        try {
+          fresh.start();
+          setIsListening(true);
+        } catch (e) {
+          console.warn('Speech recognition start failed:', e);
+        }
+      }
     }
   };
 
-  // Play response with Orpheus voice
+  // Play response with spiritual speech synthesis
   const playVoiceResponse = async (text: string) => {
     if (!voiceSettings.voiceEnabled || isPlayingVoice) return;
 
     setIsPlayingVoice(true);
     try {
-      // Get recommended voice based on content
-      const recommendedVoice = getRecommendedVoiceForContent(text);
-      const voiceProfile = voiceSettings.voiceProfile || recommendedVoice;
-      
-      console.log(`Playing response with ${voiceProfile} voice profile`);
-      
-      const result = await orpheusVoice.synthesizeText(text, voiceProfile);
-      
-      if (result.audioUrl) {
-        const audio = new Audio(result.audioUrl);
-        audio.onended = () => setIsPlayingVoice(false);
-        audio.onerror = () => setIsPlayingVoice(false);
-        await audio.play();
-      } else {
-        // Fallback to browser synthesis already handled in orpheusVoice
-        setIsPlayingVoice(false);
-      }
+      await spiritualSpeech.speakSpiritualGuidance(text, () => {}, () => setIsPlayingVoice(false));
     } catch (error) {
       console.error('Voice playback error:', error);
       setIsPlayingVoice(false);
@@ -223,10 +239,9 @@ export function VERSWhisperSimple() {
   // Test voice function
   const testVoice = async () => {
     if (isPlayingVoice) return;
-    
+
     try {
-      const result = await orpheusVoice.testVoice(voiceSettings.voiceProfile);
-      await playVoiceResponse(result.text);
+      await playVoiceResponse("Hello, I am VERS, your spiritual guide. How may I assist your consciousness evolution today?");
     } catch (error) {
       console.error('Voice test error:', error);
     }
@@ -366,7 +381,7 @@ export function VERSWhisperSimple() {
                     <Label className="text-cosmic-100">Spiritual Voice Profile</Label>
                     <select
                       value={voiceSettings.voiceProfile}
-                      onChange={(e) => setVoiceSettings(prev => ({ ...prev, voiceProfile: e.target.value as SpiritualVoiceProfile }))}
+                      onChange={(e) => setVoiceSettings(prev => ({ ...prev, voiceProfile: e.target.value }))}
                       className="w-full p-2 bg-cosmic-800 border border-cosmic-600 rounded text-cosmic-100"
                     >
                       <option value="aurora-divine">Aurora Divine - Compassionate feminine</option>

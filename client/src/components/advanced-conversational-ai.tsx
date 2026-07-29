@@ -33,13 +33,6 @@ import {
 } from "lucide-react";
 import { useMobileOptimizations } from "@/hooks/use-mobile-optimizations";
 import { spiritualSpeech, VoiceProfile, SPIRITUAL_VOICES } from "@/lib/speech-synthesis";
-import {
-  resembleVoice,
-  RESEMBLE_SPIRITUAL_VOICES,
-  generateSpiritualGuidance
-} from "@/lib/resemble-voice-synthesis";
-import { SpiritualLogger } from "@/lib/typescript-enhancements";
-import { whisperLiveVERS, type TranscriptionResult } from "@/lib/whisper-live-integration";
 
 // Advanced conversational AI interfaces based on awesome-conversational-ai best practices
 interface ConversationContext {

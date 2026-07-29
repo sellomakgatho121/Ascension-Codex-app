@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { SacredGeometryBackground, SpiritualParticleSystem } from "@/components/advanced-animations";
 import { useMobileOptimizations } from "@/hooks/use-mobile-optimizations";
-import { useGeminiTTS } from "@/lib/use-gemini-tts";
+import { spiritualSpeech, SPIRITUAL_VOICES, VoiceProfile } from "@/lib/speech-synthesis";
 
 // Enhanced speech recognition with advanced language processing
 interface SpeechConfig {
@@ -74,15 +74,6 @@ declare global {
   }
 }
 
-interface VoiceProfile {
-  name: string;
-  voice: SpeechSynthesisVoice | null;
-  rate: number;
-  pitch: number;
-  volume: number;
-  spiritualTone: 'gentle' | 'wise' | 'energetic' | 'calming';
-}
-
 interface Message {
   id: string;
   content: string;
@@ -113,41 +104,6 @@ const defaultSpeechConfig: SpeechConfig = {
   confidence: 0.7,
 };
 
-const spiritualVoiceProfiles: VoiceProfile[] = [
-  {
-    name: 'Gentle Guide',
-    voice: null,
-    rate: 0.8,
-    pitch: 1.1,
-    volume: 0.9,
-    spiritualTone: 'gentle',
-  },
-  {
-    name: 'Wise Teacher',
-    voice: null,
-    rate: 0.9,
-    pitch: 0.9,
-    volume: 1.0,
-    spiritualTone: 'wise',
-  },
-  {
-    name: 'Energetic Catalyst',
-    voice: null,
-    rate: 1.1,
-    pitch: 1.2,
-    volume: 1.0,
-    spiritualTone: 'energetic',
-  },
-  {
-    name: 'Calming Presence',
-    voice: null,
-    rate: 0.7,
-    pitch: 0.8,
-    volume: 0.8,
-    spiritualTone: 'calming',
-  },
-];
-
 export function EnhancedVERSAI() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -162,7 +118,7 @@ export function EnhancedVERSAI() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [speechConfig, setSpeechConfig] = useState<SpeechConfig>(defaultSpeechConfig);
-  const [selectedVoiceProfile, setSelectedVoiceProfile] = useState<VoiceProfile>(spiritualVoiceProfiles[0]);
+  const [selectedVoiceProfile, setSelectedVoiceProfile] = useState(SPIRITUAL_VOICES[0]);
   const [visualization, setVisualization] = useState<SpeechVisualization>({
     isListening: false,
     isSpeaking: false,
@@ -184,24 +140,33 @@ export function EnhancedVERSAI() {
 
   const { touchDevice, adaptiveLoading, networkStatus } = useMobileOptimizations();
 
-  // --- GEMINI TTS (NotebookLM-quality natural speech) ---
-  const {
-    speak: speakGemini,
-    speakWithChat,
-    stop: stopGeminiSpeech,
-    isSpeaking: geminiIsSpeaking,
-    isLoading: ttsLoading,
-    voiceProfiles: geminiVoiceProfiles,
-    selectedVoice: selectedGeminiVoice,
-    setSelectedVoice: setSelectedGeminiVoice
-  } = useGeminiTTS({
-    defaultVoice: 'sage-teacher',
-    onSpeakStart: () => setVisualization(prev => ({ ...prev, isSpeaking: true })),
-    onSpeakEnd: () => setVisualization(prev => ({ ...prev, isSpeaking: false })),
-    useBrowserFallback: true
-  });
+  // --- TTS using Web Speech API with spiritual voice profiles ---
+  const [geminiIsSpeaking, setGeminiSpeaking] = useState(false);
 
-  // Sync Gemini speaking state with visualization
+  const speakTextWithProfile = async (text: string, profile: VoiceProfile) => {
+    if (!('speechSynthesis' in window)) return;
+    spiritualSpeech.setVoiceProfile(profile.id);
+    setGeminiSpeaking(true);
+    await spiritualSpeech.speak(text, () => {}, () => setGeminiSpeaking(false));
+  };
+
+  const speakText = (text: string, tone: 'gentle' | 'wise' | 'energetic' | 'calming' = 'gentle') => {
+    const profile = spiritualSpeech.getAvailableVoices().find(v => v.id === tone) || spiritualSpeech.getAvailableVoices()[0];
+    speakTextWithProfile(text, profile);
+  };
+
+  const speakGemini = async (text: string, voiceId?: string) => {
+    if (voiceId) spiritualSpeech.setVoiceProfile(voiceId);
+    setGeminiSpeaking(true);
+    await spiritualSpeech.speak(text, () => {}, () => setGeminiSpeaking(false));
+  };
+
+  const stopGeminiSpeech = () => {
+    spiritualSpeech.stop();
+    setGeminiSpeaking(false);
+  };
+
+  // Sync speaking state with visualization
   useEffect(() => {
     setVisualization(prev => ({ ...prev, isSpeaking: geminiIsSpeaking }));
   }, [geminiIsSpeaking]);
@@ -484,51 +449,6 @@ export function EnhancedVERSAI() {
     return enhancedPrompt;
   };
 
-  // Enhanced text-to-speech with voice profiles
-  const speakTextWithProfile = (text: string, profile: VoiceProfile) => {
-    if (!('speechSynthesis' in window)) return;
-
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    // Apply voice profile settings
-    utterance.rate = profile.rate;
-    utterance.pitch = profile.pitch;
-    utterance.volume = profile.volume;
-
-    // Find best matching voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice =>
-      voice.name.toLowerCase().includes('female') ||
-      voice.name.toLowerCase().includes('natural')
-    ) || voices[0];
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
-
-    utterance.onstart = () => {
-      setVisualization(prev => ({ ...prev, isSpeaking: true }));
-    };
-
-    utterance.onend = () => {
-      setVisualization(prev => ({ ...prev, isSpeaking: false }));
-    };
-
-    utterance.onerror = () => {
-      setVisualization(prev => ({ ...prev, isSpeaking: false }));
-    };
-
-    synthesisRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-  };
-
-  const speakText = (text: string, tone: 'gentle' | 'wise' | 'energetic' | 'calming' = 'gentle') => {
-    const profile = spiritualVoiceProfiles.find(p => p.spiritualTone === tone) || spiritualVoiceProfiles[0];
-    speakTextWithProfile(text, profile);
-  };
-
   const addSystemMessage = (content: string) => {
     const systemMessage: Message = {
       id: Date.now().toString(),
@@ -553,12 +473,7 @@ export function EnhancedVERSAI() {
   };
 
   const stopSpeaking = () => {
-    // Stop Gemini TTS
-    stopGeminiSpeech();
-    // Also stop browser fallback if active
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    spiritualSpeech.stop();
     setVisualization(prev => ({ ...prev, isSpeaking: false }));
   };
 
@@ -647,7 +562,7 @@ export function EnhancedVERSAI() {
                     Voice Profile
                   </label>
                   <div className="space-y-2">
-                    {spiritualVoiceProfiles.map((profile) => (
+                    {SPIRITUAL_VOICES.map((profile) => (
                       <Button
                         key={profile.name}
                         variant="outline"
