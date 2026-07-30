@@ -1,13 +1,33 @@
 /**
  * Vercel serverless handler for Ascension Codex.
  *
- * Vercel runs `npm run build` first (which creates dist/index.js
- * with the bundled Express app), then this handler imports the
- * built app and hands it to Vercel's Node.js runtime.
+ * Imports initApp() from the built server bundle and awaits it
+ * before forwarding requests to the initialized Express app.
  */
 
-// Re-export the built app so Vercel wraps it as a serverless function.
-// The build step compiles server/index.ts -> dist/index.js via esbuild.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore -- dist/index.js is generated at build time; no declaration file exists
-export { app } from "../dist/index.js";
+// Cache the initialized app across warm starts
+let app: any = null;
+let initPromise = null;
+
+export default async function handler(req: any, res: any) {
+  // Lazy init the Express app on first request
+  if (!app) {
+    if (!initPromise) {
+      initPromise = import("../dist/index.js").then((m) => m.initApp());
+      initPromise.catch(() => {
+        initPromise = null;
+        app = null;
+      });
+    }
+    try {
+      app = await initPromise;
+    } catch (err: any) {
+      console.error("Failed to initialize app:", err.message);
+      res.status(500).send(`Server init failed: ${err.message}`);
+      return;
+    }
+  }
+
+  // Forward to Express
+  app(req, res);
+}

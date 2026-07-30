@@ -43,7 +43,7 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+export async function initApp(): Promise<Express.Express> {
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -79,6 +79,14 @@ app.use((req, res, next) => {
       log(`serving on port ${port}`);
     });
   }
-})();
+
+  return app;
+}
+
+// Initialize immediately for direct execution (npm run dev, npm start)
+initApp().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
+});
 
 export { app };
